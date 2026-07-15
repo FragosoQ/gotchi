@@ -1,6 +1,6 @@
 // Ergo'Gotchi — Service Worker (PWA offline)
 // Estratégia: index network-first (updates chegam), CDN/modelo cache-first.
-const CACHE = 'ergogotchi-v2';
+const CACHE = 'ergogotchi-v3';
 const CORE = ['./', './index.html', './manifest.webmanifest',
               './icons/icon-192.png', './icons/icon-512.png'];
 
@@ -31,13 +31,16 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // CDN (MediaPipe wasm/modelo, Google Fonts) + próprios: cache-first
+  // Só cache-first para hosts CONHECIDOS (MediaPipe, fontes, próprios).
+  // Tudo o resto (ex.: pesos do WebLLM no huggingface) passa DIRETO,
+  // sem interceção — o WebLLM gere a sua própria cache.
   const cacheable = u.origin === location.origin ||
     ['cdn.jsdelivr.net', 'esm.run', 'storage.googleapis.com',
      'fonts.googleapis.com', 'fonts.gstatic.com'].includes(u.hostname);
+  if (!cacheable) return;
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(r => {
-      if (r.ok && cacheable) {
+      if (r.ok) {
         const cp = r.clone();
         caches.open(CACHE).then(c => c.put(e.request, cp));
       }
