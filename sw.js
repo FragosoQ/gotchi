@@ -1,6 +1,6 @@
 // Ergo'Gotchi — Service Worker (PWA offline)
 // Estratégia: index network-first (updates chegam), CDN/modelo cache-first.
-const CACHE = 'ergogotchi-v1';
+const CACHE = 'ergogotchi-v2';
 const CORE = ['./', './index.html', './manifest.webmanifest',
               './icons/icon-192.png', './icons/icon-512.png'];
 
@@ -33,7 +33,7 @@ self.addEventListener('fetch', e => {
 
   // CDN (MediaPipe wasm/modelo, Google Fonts) + próprios: cache-first
   const cacheable = u.origin === location.origin ||
-    ['cdn.jsdelivr.net', 'storage.googleapis.com',
+    ['cdn.jsdelivr.net', 'esm.run', 'storage.googleapis.com',
      'fonts.googleapis.com', 'fonts.gstatic.com'].includes(u.hostname);
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(r => {
