@@ -761,7 +761,7 @@ async function gotchiSay(ev,ctx=''){
       const fase=PHASES[phase()][0];
       const r=await askBrain([
         {role:'system',content:T('sys_gotchi')+fase+'.'},
-        {role:'user',content:'Evento: '+ev+'. Contexto: '+ctx}],40);
+        {role:'user',content:(LANG==='pt'?'Evento: ':'Event: ')+ev+(LANG==='pt'?'. Contexto: ':'. Context: ')+ctx}],40);
       if(r)line=r.trim().slice(0,120);
     }catch(e){}
   }
@@ -853,7 +853,7 @@ setInterval(()=>{
   const nowD=new Date();
   if(nowD.getMinutes()===0&&nowD.getSeconds()<2){
     const rh=riskHours();
-    if(rh&&rh[nowD.getHours()]>0.35&&lvl===0) gotchiSay('preventive','às '+nowD.getHours()+'h costuma correr mal');
+    if(rh&&rh[nowD.getHours()]>0.35&&lvl===0) gotchiSay('preventive',(LANG==='pt'?'às '+nowD.getHours()+'h costuma correr mal':'around '+nowD.getHours()+'h things usually go wrong'));
   }
   // 20-20-20: 20 min seguidos ao ecrã -> sugerir pausa ocular
   if(running&&a!=null){ if(++screenSecs===1200){screenSecs=0;toast(T('t2020'));speak(T('s2020'));} }
