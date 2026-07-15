@@ -154,6 +154,7 @@ nav.bottom .row{display:flex}
   nav.bottom{display:block}
   main{padding:14px 14px 92px}
   .g-top{grid-template-columns:1fr}
+  .c-got{order:-2}.c-cam{order:-1}.c-ang{order:0}
   .g-stats{grid-template-columns:1fr 1fr}
   .g-charts{grid-template-columns:1fr}
   .logo{font-size:11px}
@@ -187,7 +188,7 @@ nav.bottom .row{display:flex}
 <!-- ================= VISÃO GERAL ================= -->
 <section class="page on" id="p-geral">
   <div class="grid g-top">
-    <div class="card">
+    <div class="card c-cam">
       <h3>Câmara ao vivo</h3>
       <div id="camWrap">
         <video id="cam" playsinline muted></video>
@@ -203,7 +204,7 @@ nav.bottom .row{display:flex}
       </div>
     </div>
 
-    <div class="card">
+    <div class="card c-ang">
       <h3>Ângulo cervical</h3>
       <div class="bigAng px" id="angNum">--<small>°</small></div>
       <div id="angEmoji">🙂</div>
@@ -212,7 +213,7 @@ nav.bottom .row{display:flex}
       <button class="btn" id="calibBtn" style="display:block;margin:12px auto 0;font-size:12px;padding:8px 16px">Calibrar postura</button>
     </div>
 
-    <div class="card">
+    <div class="card c-got">
       <h3>Ergo'Gotchi</h3>
       <div id="bubble"></div>
       <canvas id="sprC" width="64" height="64" style="width:148px;height:148px"></canvas>
@@ -304,14 +305,17 @@ nav.bottom .row{display:flex}
       <div class="tog" id="cfgSom"><i></i></div></div>
     <div class="cfgrow"><label>Vibração (telemóvel)<small>Vibra em alerta crítico</small></label>
       <div class="tog" id="cfgVib"><i></i></div></div>
+    <div class="cfgrow" id="rowInstall" style="display:none"><label>Instalar como app<small>Adiciona o Ergo'Gotchi ao ecrã principal</small></label>
+      <button class="btn fire" id="btnInstall">📲 Instalar</button></div>
+    <div class="cfgrow" id="rowIOS" style="display:none"><label>Instalar no iPhone/iPad<small>Toca em Partilhar <b>⎋</b> → "Adicionar ao ecrã principal"</small></label></div>
     <div class="cfgrow"><label>Voz do Gotchi<small>A chama fala (pt-PT) nos alertas e conselhos</small></label>
       <div class="tog" id="cfgVoz"><i></i></div></div>
-    <div class="cfgrow"><label>Cérebro IA — endpoint<small>API compatível OpenAI. Ollama local: http://localhost:11434<br>(arranca com OLLAMA_ORIGINS=* para permitir o browser)</small></label>
+    <div class="cfgrow"><label>Cérebro IA no dispositivo <span id="mlcProg" style="color:var(--green)"></span><small>Modelo de linguagem a correr no browser (WebGPU).<br>Descarrega ~800 MB uma vez e fica guardado — 100% local.</small></label>
+      <button class="btn fire" id="mlcBtn">Ativar</button></div>
+    <div class="cfgrow"><label>Cérebro IA — endpoint (avançado)<small>Alternativa: API compatível OpenAI (ex.: Ollama com OLLAMA_ORIGINS=*)</small></label>
       <input type="text" id="cfgBrain" placeholder="http://localhost:11434"></div>
     <div class="cfgrow"><label>Cérebro IA — modelo<small>ex.: llama3.2, qwen2.5:3b, mistral</small></label>
       <input type="text" id="cfgBrainM" placeholder="llama3.2" style="width:140px"></div>
-    <div class="cfgrow"><label>Ligação ao colar<small>IP do colar na tua rede — aparece no ecrã CONFIG do próprio colar.<br>A app envia-lhe o ângulo da câmara diretamente (ex.: http://192.168.1.123)</small></label>
-      <input type="text" id="cfgPi" placeholder="http://192.168.1.x"></div>
     <div class="cfgrow"><label>Dados<small>Apaga HP, EXP, histórico e conquistas deste dispositivo</small></label>
       <button class="btn" id="cfgReset">Repor tudo</button></div>
   </div>
@@ -355,7 +359,7 @@ const LS='ergogotchi_v1';
 const DEF={hp:100,exp:0,streak:0,day:'',goodSecs:0,alerts:0,mission:false,
   hourGood:Array(24).fill(0),hourTotal:Array(24).fill(0),
   ach:{}, days:[], domFlex:0, domFha:0, ergo:{},
-  cfg:{ok:20,warn:35,som:true,vib:true,voz:true,pi:'',brain:'',brainM:'llama3.2'},
+  cfg:{ok:20,warn:35,som:true,vib:true,voz:true,brain:'',brainM:'llama3.2'},
   hist:[] /* [{t,ang}] por ~5s, máx 6h */ };
 let G = Object.assign({},DEF,JSON.parse(localStorage.getItem(LS)||'{}'));
 G.cfg = Object.assign({},DEF.cfg,G.cfg);
@@ -479,7 +483,8 @@ function poseLoop(){
       (apanha o queixo ao peito, em que a orelha mal se move) */
 // referências calibráveis (botão "Calibrar postura"): posição neutra do utilizador
 // defaults: cabeça-à-frente 0°, nariz ~15° abaixo da orelha
-let lastRaw = null;                        // {fha, flex} da última medição
+let lastRaw = null;                        // componentes da última medição
+let dropMed = [];                          // mediana adaptativa da "altura da cabeça"
 function cervical(L){
   const sides=[[7,11],[8,12]];               // [orelha, ombro] esq/dir
   let best=null,bv=-1;
@@ -500,11 +505,31 @@ function cervical(L){
     const ndx=Math.abs(nose.x-ear.x);
     flexRaw=Math.atan2(ndy,ndx)*180/Math.PI; // ângulo abaixo da horizontal
   }
+
+  // 3.ª componente (chave em mobile/frontal): QUEDA DA CABEÇA
+  // distância vertical nariz->linha dos ombros ÷ largura de ombros.
+  // Queixo ao peito => o nariz "afunda" em direção aos ombros.
+  let drop=null;
+  if((nose.visibility??1)>0.5&&(L[11].visibility??1)>0.55&&(L[12].visibility??1)>0.55){
+    const sw=Math.hypot(L[11].x-L[12].x,L[11].y-L[12].y);
+    if(sw>0.12){                             // vista suficientemente frontal
+      drop=((L[11].y+L[12].y)/2-nose.y)/sw;  // maior = cabeça mais alta
+      dropMed.push(drop); if(dropMed.length>300)dropMed.shift();
+    }
+  }
+  let flex2=0;
+  if(drop!=null){
+    let refD=G.cfg.calib&&G.cfg.calib.drop;
+    if(!refD&&dropMed.length>=60)
+      refD=[...dropMed].sort((a,b)=>a-b)[Math.floor(dropMed.length/2)];
+    if(refD) flex2=Math.max(0,(1-drop/refD)*75);   // queda de 50% ~ 37°
+  }
+
   const ref=G.cfg.calib||{fha:0,flex:15};
   const dFha=Math.max(0,fha-ref.fha);
   const dFlex=flexRaw==null?0:Math.max(0,flexRaw-ref.flex);
-  lastRaw={fha,flex:flexRaw,dFha,dFlex};
-  return Math.max(dFha,dFlex);
+  lastRaw={fha,flex:flexRaw,drop,dFha,dFlex:Math.max(dFlex,flex2)};
+  return Math.max(dFha,dFlex,flex2);
 }
 
 const BONES=[[7,11],[8,12],[0,7],[0,8],[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24]];
@@ -593,7 +618,7 @@ async function gotchiSay(ev,ctx=''){
   if(!urgent&&now-lastSay<90000)return;
   lastSay=now;
   let line=PHRASES[ev][Math.floor(Math.random()*PHRASES[ev].length)];
-  if(G.cfg.brain){
+  if(hasBrain()){
     try{
       const fase=PHASES[phase()][0];
       const r=await askBrain([
@@ -607,8 +632,34 @@ async function gotchiSay(ev,ctx=''){
   speak(line);
 }
 
-/* ---------------- CÉREBRO IA (API compatível OpenAI) ---------------- */
+/* ---------------- CÉREBRO IA ----------------
+   Prioridade: 1) WebLLM no dispositivo  2) endpoint (avançado)  */
+let mlc=null, mlcLoading=false;
+const hasBrain=()=>!!(mlc||G.cfg.brain);
+async function loadWebLLM(){
+  if(mlc||mlcLoading)return;
+  if(!navigator.gpu){toast('❌ Este dispositivo não suporta WebGPU (o cérebro no dispositivo precisa dele).');return}
+  mlcLoading=true;
+  const btn=$('mlcBtn'); if(btn){btn.disabled=true;btn.textContent='A descarregar...'}
+  try{
+    const {CreateMLCEngine}=await import('https://esm.run/@mlc-ai/web-llm');
+    mlc=await CreateMLCEngine('Llama-3.2-1B-Instruct-q4f16_1-MLC',{
+      initProgressCallback:p=>{const el=$('mlcProg');if(el)el.textContent=Math.round((p.progress||0)*100)+'%'}});
+    G.cfg.webllm=true; save();
+    if(btn){btn.textContent='✔ Ativo'}
+    const el=$('mlcProg'); if(el)el.textContent='pronto';
+    toast('🧠 Cérebro IA ativo no dispositivo!'); speak('Cérebro ligado. Agora penso por mim!');
+  }catch(e){
+    if(btn){btn.disabled=false;btn.textContent='Ativar'}
+    toast('Erro a carregar o cérebro: '+(e.message||e));
+  }
+  mlcLoading=false;
+}
 async function askBrain(messages,maxTok=300){
+  if(mlc){
+    const r=await mlc.chat.completions.create({messages,max_tokens:maxTok,temperature:.8});
+    return r.choices?.[0]?.message?.content||'';
+  }
   const url=G.cfg.brain.replace(/\/$/,'')+'/v1/chat/completions';
   const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:G.cfg.brainM||'llama3.2',messages,max_tokens:maxTok,temperature:.8})});
@@ -679,14 +730,6 @@ setInterval(()=>{
   $('alertFlash').classList.toggle('on',gState==='bad');
   // conquistas
   for(const A of ACH)if(!G.ach[A.id]&&A.f()){G.ach[A.id]=Date.now();toast(A.ic+' Conquista: '+A.t);}
-  // ponte p/ Pi
-  if(G.cfg.pi&&a!=null&&!(window._piBusy)){
-    window._piBusy=true;
-    fetch(G.cfg.pi.replace(/\/$/,'')+'/api/camera',{method:'POST',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({angle:Math.round(a*10)/10,ts:Date.now()})})
-      .catch(()=>{}).finally(()=>setTimeout(()=>window._piBusy=false,1800));
-  }
   save(); render(a);
 },1000);
 
@@ -830,7 +873,7 @@ function renderAch(){
 /* ================================================================
    CONFIG
 ================================================================ */
-$('cfgOk').value=G.cfg.ok; $('cfgWarn').value=G.cfg.warn; $('cfgPi').value=G.cfg.pi;
+$('cfgOk').value=G.cfg.ok; $('cfgWarn').value=G.cfg.warn;
 $('cfgBrain').value=G.cfg.brain||''; $('cfgBrainM').value=G.cfg.brainM||'llama3.2';
 $('cfgVoz').classList.toggle('on',G.cfg.voz);
 $('cfgVoz').onclick=()=>{G.cfg.voz=!G.cfg.voz;$('cfgVoz').classList.toggle('on',G.cfg.voz);save();if(G.cfg.voz)speak('Olá! A voz está ligada.')};
@@ -839,7 +882,6 @@ $('cfgBrainM').onchange=e=>{G.cfg.brainM=e.target.value.trim();save()};
 $('cfgSom').classList.toggle('on',G.cfg.som); $('cfgVib').classList.toggle('on',G.cfg.vib);
 $('cfgOk').onchange=e=>{G.cfg.ok=+e.target.value;save()};
 $('cfgWarn').onchange=e=>{G.cfg.warn=+e.target.value;save()};
-$('cfgPi').onchange=e=>{G.cfg.pi=e.target.value.trim();save()};
 $('cfgSom').onclick=()=>{G.cfg.som=!G.cfg.som;$('cfgSom').classList.toggle('on',G.cfg.som);save()};
 $('cfgVib').onclick=()=>{G.cfg.vib=!G.cfg.vib;$('cfgVib').classList.toggle('on',G.cfg.vib);save()};
 $('cfgReset').onclick=()=>{if(confirm('Repor todos os dados do Ergo-Gotchi?')){localStorage.removeItem(LS);location.reload()}};
@@ -921,7 +963,7 @@ function drawRisk(){
 /* ---------------- COACH: análise IA ---------------- */
 $('coachBtn').onclick=async()=>{
   const out=$('coachOut'); out.classList.add('on');
-  if(!G.cfg.brain){out.textContent='Configura primeiro o Cérebro IA em Config (ex.: Ollama local em http://localhost:11434 com OLLAMA_ORIGINS=*).';return}
+  if(!hasBrain()){out.textContent='Ativa primeiro o Cérebro IA em Config (botão Ativar — corre no teu dispositivo).';return}
   out.textContent='A pensar...'; $('coachBtn').disabled=true;
   try{
     const ctx={hoje:{score:dayTotal()?score():null,minBoa:Math.round(G.goodSecs/60),alertas:G.alerts,
@@ -983,12 +1025,27 @@ $('calibBtn').onclick=async()=>{
   }
   if(lastRaw){
     G.cfg.calib={fha:Math.round(lastRaw.fha*10)/10,
-                 flex:lastRaw.flex==null?15:Math.round(lastRaw.flex*10)/10};
+                 flex:lastRaw.flex==null?15:Math.round(lastRaw.flex*10)/10,
+                 drop:lastRaw.drop==null?null:Math.round(lastRaw.drop*100)/100};
     save(); angleF=0; sndRecover();
     toast('✅ Postura de referência calibrada ('+G.cfg.calib.fha+'° / '+G.cfg.calib.flex+'°)');
   }
   btn.disabled=false;
 };
+
+$('mlcBtn').onclick=loadWebLLM;
+if(G.cfg.webllm) setTimeout(loadWebLLM,3000);   // reativa em visitas seguintes
+
+/* ---------------- PWA: instalação explícita ---------------- */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredPrompt=e;
+  $('rowInstall').style.display='flex';
+});
+$('btnInstall').onclick=()=>{ if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;$('rowInstall').style.display='none';} };
+window.addEventListener('appinstalled',()=>{toast('📲 App instalada!');$('rowInstall').style.display='none'});
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!matchMedia('(display-mode: standalone)').matches)
+  $('rowIOS').style.display='flex';
 
 /* ---------------- PWA: service worker + estado offline ---------------- */
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){
