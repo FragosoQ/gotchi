@@ -39,5 +39,3 @@ receber o ângulo da câmara. Instruções no
 │  localStorage           │ ◄──GET /api/status──│ jogo em NVS      │
 └─────────────────────────┘                     └──────────────────┘
 ```
-
-Feito por **@fragoso** com apoio do Claude.
