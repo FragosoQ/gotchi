@@ -26,6 +26,11 @@ opcional (ESP32-C6 + AMOLED 1.8") mede o ângulo cervical com IMU.
 - **Coach IA** no dispositivo (WebLLM, Llama 3.2 1B — precisa de WebGPU, ~800 MB
   descarregados uma vez), horas de risco aprendidas e exercícios sugeridos
 - **Alertas** sonoros escalonados, voz (TTS) e vibração (telemóvel)
+- **Voz em português de Portugal**: escolhe automaticamente uma voz pt-PT (a "Raquel"
+  natural no Edge, Joana/Catarina no iPhone/Mac); só usa pt-BR se não houver nenhuma
+- **🎭 Personalidade do Gotchi** (Config): 🔥 Amigável · 🪖 Sargento · 😏 Sarcástico ·
+  🤡 Piadolas · 🧘 Zen — cada uma muda as frases (PT/EN), o tom e a velocidade da voz
+  e o estilo do Coach IA
 - **PT / EN** em toda a app (incluindo as falas da chama)
 - **⌚ Ligação ao colar por Bluetooth**: botão "COLAR" no topo (Chrome/Edge no PC ou Android).
   Ligados, há um só Gotchi: a câmara envia o ângulo ao colar e a app mostra o estado dele
