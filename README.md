@@ -12,7 +12,7 @@ opcional (ESP32-C6 + AMOLED 1.8") mede o ângulo cervical com IMU.
 
 ## 📱 App
 
-**➜ Abrir: https://fragosoq.github.io/gotchi/**
+**➜ Abrir: https://fragoso.cloud/gotchi/**
 
 - **Visão computacional local** (MediaPipe Pose) — o vídeo nunca sai do dispositivo
 - **Ângulo cervical** combinado: cabeça-à-frente, flexão (orelha→nariz) e queda da
