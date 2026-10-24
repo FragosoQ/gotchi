@@ -917,21 +917,27 @@ const PERSO={
 };
 function curPerso(){return PERSO[G.cfg.perso]||PERSO.amigo}
 const PHRASES=new Proxy({},{get:(_,k)=>{const P=curPerso().phrases;return (P&&P[LANG]&&P[LANG][k])||PHRASES_ALL[LANG][k]}});
-let lastSay=0;
+let lastSay=0, lastFast={}, brainBusy=false, ghostTalk=0;
 async function gotchiSay(ev,ctx=''){
   const now=Date.now();
   const urgent=['mission','preventive','greet','death','reborn'].includes(ev);
-  if(!urgent&&now-lastSay<90000)return;
-  lastSay=now;
+  const fast=['bad','recover'].includes(ev);       // reagem logo ao que fazes
+  if(fast){ if(now-(lastFast[ev]||0)<20000)return; lastFast[ev]=now; }
+  else if(!urgent&&now-lastSay<90000)return;
+  if(ev!=='greet') lastSay=now;                     // o olá não bloqueia avisos
   let line=PHRASES[ev][Math.floor(Math.random()*PHRASES[ev].length)];
-  if(hasBrain()){
+  if(hasBrain()&&!brainBusy){
     try{
       const fase=PHASES[phase()][0];
-      const r=await askBrain([
+      brainBusy=true;
+      const job=askBrain([
         {role:'system',content:T('sys_gotchi')+curPerso().llm[LANG]+(LANG==='pt'?'. Fase atual: ':'. Current stage: ')+fase+'.'},
         {role:'user',content:(LANG==='pt'?'Evento: ':'Event: ')+ev+(LANG==='pt'?'. Contexto: ':'. Context: ')+ctx}],40);
+      job.catch(()=>{}).finally(()=>{brainBusy=false});
+      // se a IA demorar mais de 3 s, fala já com a frase escrita do perfil
+      const r=await Promise.race([job,new Promise(res=>setTimeout(()=>res(''),3000))]);
       if(r)line=r.trim().slice(0,120);
-    }catch(e){}
+    }catch(e){ brainBusy=false; }
   }
   const b=$('bubble'); b.textContent=line; b.classList.add('on');
   clearTimeout(b._t); b._t=setTimeout(()=>b.classList.remove('on'),9000);
@@ -1126,6 +1132,7 @@ setInterval(()=>{
       if(!L&&G.deadRes>=RES_SECS){ resurrect(); }
     }
     gState=Date.now()<celebrateUntil?'celebrate':'ghost';
+    if(++ghostTalk>=300){ ghostTalk=0; gotchiSay('ghost'); }   // o fantasma fala de 5 em 5 min
     $('alertFlash').classList.remove('on');
     if(fresh&&window.LM)runChecks(window.LM);
     save(); render(a);
