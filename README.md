@@ -41,6 +41,27 @@ opcional (ESP32-C6 + AMOLED 1.8") mede o ângulo cervical com IMU.
 |:---:|:---:|:---:|
 | <img src="assets/gotchi_happy.gif" width="128"> | <img src="assets/gotchi_evo.gif" width="128"> | <img src="assets/gotchi_ghost.gif" width="128"> |
 
+### 🗣️ Quando o Gotchi fala
+
+Fala com a voz e mostra a frase num balão por cima da chama. Para ouvir a voz, liga **Voz do Gotchi** em Config.
+Precisa de um ângulo: a câmara ligada ou o colar ligado por Bluetooth.
+
+| Momento | Quando acontece | Intervalo mínimo |
+|---|---|---|
+| 👋 Cumprimento | Ao ligar a câmara | — |
+| 😟 Descair | Passa de boa postura para "Atenção" (>20°) | 90 s |
+| 🚨 Postura má | Passa para "Crítico" (>35°) | 20 s |
+| 😌 Recuperação | Volta à boa postura depois de um aviso | 20 s |
+| 👏 Elogio | 30 min seguidos de boa postura | 90 s |
+| 🏆 Missão | Missão diária cumprida | — |
+| ⏰ Preventivo | À hora certa, numa hora de risco aprendida (3+ dias de dados) | — |
+| 💪 Exercício | A cada 3 alertas críticos | 90 s |
+| 👻 Fantasma | De 5 em 5 min enquanto está morto | 90 s |
+| 👻/🔥 Morte e renascimento | Quando morre ou ressuscita | — |
+
+Com o Cérebro IA ativo, as frases são criadas pela IA no estilo da personalidade escolhida.
+Se a IA demorar mais de 3 s, o Gotchi usa uma frase já escrita.
+
 > A instalação PWA e a câmara no telemóvel exigem HTTPS — por isso a app corre
 > no GitHub Pages e não a partir do ficheiro aberto localmente.
 
