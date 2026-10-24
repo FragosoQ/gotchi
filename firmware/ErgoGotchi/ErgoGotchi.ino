@@ -38,7 +38,7 @@ uint8_t UI_LANG = 0;   // 0=PT 1=EN (persistido em NVS)
 
 // ---- Hardware ----
 Adafruit_XCA9554 expander;
-XPowersPMU PMU;
+XPowersPMU axpPMU;
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
     LCD_CS, LCD_SCLK, LCD_SDIO0, LCD_SDIO1, LCD_SDIO2, LCD_SDIO3);
@@ -69,7 +69,7 @@ uint8_t  frame = 0;
 bool     bootWasDown = false;
 int      lastBatt = -1;
 
-int battery() { return PMU.isBatteryConnect() ? PMU.getBatteryPercent() : -1; }
+int battery() { return axpPMU.isBatteryConnect() ? axpPMU.getBatteryPercent() : -1; }
 
 void haptic(uint16_t ms, uint8_t pulses = 1) {
   if (HAPTIC_PIN < 0 || !ui.cfg.vibra) return;
@@ -107,7 +107,7 @@ void setup() {
   }
   delay(300);
 
-  PMU.begin(Wire, AXP2101_SLAVE_ADDRESS, IIC_SDA, IIC_SCL);
+  axpPMU.begin(Wire, AXP2101_SLAVE_ADDRESS, IIC_SDA, IIC_SCL);
 
   if (!gfx->begin()) Serial.println("[!] gfx falhou");
   if (!FT3168->begin()) Serial.println("[!] FT3168 falhou");
