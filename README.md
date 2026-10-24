@@ -27,6 +27,8 @@ opcional (ESP32-C6 + AMOLED 1.8") mede o ângulo cervical com IMU.
   descarregados uma vez), horas de risco aprendidas e exercícios sugeridos
 - **Alertas** sonoros escalonados, voz (TTS) e vibração (telemóvel)
 - **PT / EN** em toda a app (incluindo as falas da chama)
+- **⌚ Ligação ao colar por Bluetooth**: botão "COLAR" no topo (Chrome/Edge no PC ou Android).
+  Ligados, há um só Gotchi: a câmara envia o ângulo ao colar e a app mostra o estado dele
 - **PWA instalável**: botão "Instalar" no Chrome/Edge; no iPhone, Partilhar →
   "Adicionar ao ecrã principal". Funciona offline depois da primeira visita
 
@@ -37,12 +39,13 @@ opcional (ESP32-C6 + AMOLED 1.8") mede o ângulo cervical com IMU.
 > A instalação PWA e a câmara no telemóvel exigem HTTPS — por isso a app corre
 > no GitHub Pages e não a partir do ficheiro aberto localmente.
 
-## ⌚ Firmware do colar (v4)
+## ⌚ Firmware do colar (v5)
 
 Pasta [`firmware/ErgoGotchi/`](firmware/ErgoGotchi/) — Arduino para
 **Waveshare ESP32-C6-Touch-AMOLED-1.8**: 5 ecrãs com swipe, 9 estados de sprite
 (incluindo o fantasma), sons pelo altifalante ES8311, calibração por vetor de
-gravidade, idioma PT/EN e as mesmas regras de morte/ressurreição da app.
+gravidade, idioma PT/EN, as mesmas regras de morte/ressurreição da app e
+**Bluetooth** para ligar à app.
 Instruções no [README do firmware](firmware/ErgoGotchi/README.md).
 
 ![Sprites](assets/sprites_preview.png)

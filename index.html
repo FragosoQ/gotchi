@@ -31,9 +31,11 @@ header{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:
 #logoFlame{image-rendering:pixelated;width:36px;height:36px}
 .logo{font-size:14px;color:var(--gold);letter-spacing:1px;text-shadow:0 0 14px rgba(255,204,0,.35)}
 .logo small{display:block;font-family:'Space Grotesk';font-size:10px;color:var(--dim);letter-spacing:.14em;text-transform:uppercase;margin-top:5px}
-.live{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);margin-left:8px}
+.live{display:flex;align-items:center;gap:6px;font-size:11px;white-space:nowrap;color:var(--green);margin-left:8px}
 .live b{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.6s infinite}
 .live.off{color:var(--dim)} .live.off b{background:var(--dim);box-shadow:none;animation:none}
+button.live{background:none;border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit;font-size:11px;cursor:pointer}
+button.live:not(.off){border-color:var(--green)}
 @keyframes pulse{50%{opacity:.35}}
 .langb{border:1px solid var(--line);background:none;color:var(--dim);font:700 11px 'Space Grotesk';padding:5px 10px;border-radius:8px;cursor:pointer;margin-right:2px}
 .langb.on{color:var(--gold);border-color:var(--gold)}
@@ -161,6 +163,12 @@ nav.bottom .row{display:flex}
   .g-charts{grid-template-columns:1fr}
   .logo{font-size:11px}
 }
+@media (max-width:600px){
+  header{gap:8px;padding:10px 12px;flex-wrap:wrap}
+  .logo small,#hdrScore{display:none}
+  .live{white-space:nowrap;font-size:10px;margin-left:0}
+  .langb{padding:4px 7px}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -173,6 +181,7 @@ nav.bottom .row{display:flex}
   <canvas id="logoFlame" width="64" height="64"></canvas>
   <div class="logo px">ERGO'GOTCHI<small>A chama vive da tua postura</small></div>
   <div class="live off" id="liveTag"><b></b><span>CAMERA OFF</span></div>
+  <button class="live off" id="bleTag" title="Bluetooth"><b></b><span>⌚ COLAR OFF</span></button>
   <div class="sp"></div>
   <button class="langb on" id="langPT">PT</button>
   <button class="langb" id="langEN">EN</button>
@@ -312,6 +321,8 @@ nav.bottom .row{display:flex}
     <div class="cfgrow" id="rowInstall" style="display:none"><label>Instalar como app<small>Adiciona o Ergo'Gotchi ao ecrã principal</small></label>
       <button class="btn fire" id="btnInstall">📲 Instalar</button></div>
     <div class="cfgrow" id="rowIOS" style="display:none"><label>Instalar no iPhone/iPad<small>Toca em Partilhar <b>⎋</b> → "Adicionar ao ecrã principal"</small></label></div>
+    <div class="cfgrow" id="rowBle"><label>Colar Ergo'Gotchi (Bluetooth)<small>Liga a app ao colar: um só Gotchi, a câmara envia o ângulo ao colar.<br>Chrome ou Edge no PC/Android.</small></label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button class="btn fire" id="bleBtn">⌚ Ligar colar</button><button class="btn" id="bleCalBtn" style="display:none">Calibrar colar</button></div></div>
     <div class="cfgrow"><label>Voz do Gotchi<small>A chama fala (pt-PT) nos alertas e conselhos</small></label>
       <div class="tog" id="cfgVoz"><i></i></div></div>
     <div class="cfgrow"><label>Cérebro IA no dispositivo <span id="mlcProg" style="color:var(--green)"></span><small>Modelo de linguagem a correr no browser (WebGPU).<br>Descarrega ~800 MB uma vez e fica guardado — 100% local.</small></label>
@@ -373,6 +384,7 @@ pt:{
  mis_done:"🔥 Missão diária cumprida! +1000 EXP",conq:"Conquista: ",
  sw_ready:"📦 App pronta para funcionar offline",net_off:"📴 Sem internet — a app continua a funcionar",net_on:"🌐 Ligação restabelecida",
  mlc_no:"❌ Este dispositivo não suporta WebGPU (o cérebro no dispositivo precisa dele).",mlc_dl:"A descarregar...",mlc_ok:"🧠 Cérebro IA ativo no dispositivo!",mlc_say:"Cérebro ligado. Agora penso por mim!",mlc_err:"Erro a carregar o cérebro: ",mlc_ready:"pronto",
+ ble_on:"⌚ COLAR ON",ble_off:"⌚ COLAR OFF",cfg_ble:"Colar Ergo'Gotchi (Bluetooth)<small>Liga a app ao colar: um só Gotchi, a câmara envia o ângulo ao colar.<br>Chrome ou Edge no PC/Android.</small>",btn_ble_con:"⌚ Ligar colar",btn_ble_dis:"Desligar colar",btn_ble_cal:"Calibrar colar",btn_ble_wait:"A ligar...",ble_nosup:"Este browser não suporta Bluetooth — usa Chrome ou Edge (PC ou Android).",ble_ok:"⌚ Colar ligado — agora há um só Gotchi (o do colar)",ble_lost:"⌚ Ligação ao colar perdida — o colar continua sozinho",ble_back:"⌚ Colar ligado outra vez",ble_err:"Erro Bluetooth: ",ble_cal_ok:"⌚ Colar calibrado",
  voz_on:"Olá! A voz está ligada.",g_ghost:"FANTASMA 👻",death_toast:"👻 O teu Ergo'Gotchi morreu... 30 min de boa postura para o ressuscitar",reborn_toast:"🔥 RENASCEU! A chama está de volta (HP 50)",inst_done:"📲 App instalada!",
  exo_sug:"💪 Sugestão: ",exo_go:" — vai a Coach IA",exo_done:"Feito! Boa!",
  sys_gotchi:"És o Ergo'Gotchi, uma pequena chama tamagotchi que vive da postura do utilizador. Português de Portugal. Responde com UMA frase curta (máximo 14 palavras), divertida, tom de ",
@@ -412,6 +424,7 @@ en:{
  mis_done:"🔥 Daily mission complete! +1000 EXP",conq:"Achievement: ",
  sw_ready:"📦 App ready to work offline",net_off:"📴 No internet — the app keeps working",net_on:"🌐 Connection restored",
  mlc_no:"❌ This device doesn't support WebGPU (the on-device brain needs it).",mlc_dl:"Downloading...",mlc_ok:"🧠 AI Brain active on your device!",mlc_say:"Brain online. Now I think for myself!",mlc_err:"Error loading the brain: ",mlc_ready:"ready",
+ ble_on:"⌚ COLLAR ON",ble_off:"⌚ COLLAR OFF",cfg_ble:"Ergo'Gotchi collar (Bluetooth)<small>Links the app to the collar: one single Gotchi, the camera sends the angle to the collar.<br>Chrome or Edge on PC/Android.</small>",btn_ble_con:"⌚ Connect collar",btn_ble_dis:"Disconnect collar",btn_ble_cal:"Calibrate collar",btn_ble_wait:"Connecting...",ble_nosup:"This browser doesn't support Bluetooth — use Chrome or Edge (PC or Android).",ble_ok:"⌚ Collar connected — now there is one single Gotchi (the collar's)",ble_lost:"⌚ Collar connection lost — the collar keeps going on its own",ble_back:"⌚ Collar reconnected",ble_err:"Bluetooth error: ",ble_cal_ok:"⌚ Collar calibrated",
  voz_on:"Hello! Voice is on.",g_ghost:"GHOST 👻",death_toast:"👻 Your Ergo'Gotchi died... 30 min of good posture to bring it back",reborn_toast:"🔥 REBORN! The flame is back (HP 50)",inst_done:"📲 App installed!",
  exo_sug:"💪 Suggestion: ",exo_go:" — go to AI Coach",exo_done:"Done! Nice!",
  sys_gotchi:"You are Ergo'Gotchi, a small tamagotchi flame that lives on the user's posture. Reply with ONE short sentence (max 14 words), playful, in the tone of ",
@@ -523,6 +536,7 @@ function applyLang(){
   lab('cfgSom').innerHTML=T('cfg_som'); lab('cfgVib').innerHTML=T('cfg_vib');
   lab('cfgVoz').innerHTML=T('cfg_voz'); lab('mlcBtn').innerHTML=T('cfg_mlc');
   lab('btnInstall').innerHTML=T('cfg_inst');
+  lab('bleBtn').innerHTML=T('cfg_ble'); if(typeof bleUI==='function') bleUI();
   document.querySelector('#rowIOS label').innerHTML=T('cfg_ios');
   lab('cfgReset').innerHTML=T('cfg_reset');
   q('#cfgReset').textContent=T('btn_reset');
@@ -841,6 +855,119 @@ async function askBrain(messages,maxTok=300){
   return r.choices?.[0]?.message?.content||'';
 }
 
+/* ================================================================
+   COLAR por BLUETOOTH (Web Bluetooth) — ver firmware/ble_link.h
+   Ligado: o colar é o "dono" do jogo; a app envia o ângulo da
+   câmara e mostra o estado do colar (um só Gotchi).
+================================================================ */
+const BLE_SVC='e1f0a000-6f2a-4c1e-9b7d-2c0e7a90a001',
+      BLE_ANG='e1f0a001-6f2a-4c1e-9b7d-2c0e7a90a001',
+      BLE_STA='e1f0a002-6f2a-4c1e-9b7d-2c0e7a90a001',
+      BLE_CMD='e1f0a003-6f2a-4c1e-9b7d-2c0e7a90a001';
+let bleDev=null, bleAngC=null, bleCmdC=null, bleBusy=false, bleUserOff=false, bleRetry=0, bleConnecting=false;
+let collar=null, collarTs=0, collarPrev=null;
+const bleOn=()=>!!(bleDev&&bleDev.gatt&&bleDev.gatt.connected);
+const bleLinked=()=>bleOn()&&collar&&Date.now()-collarTs<5000;
+
+function bleUI(){
+  const tag=$('bleTag'), btn=$('bleBtn'), cal=$('bleCalBtn');
+  if(!navigator.bluetooth){ tag.style.display='none'; }
+  const on=bleOn();
+  tag.classList.toggle('off',!on);
+  let txt=on?T('ble_on'):T('ble_off');
+  if(on&&collar&&collar.batt<=100) txt+=' · '+collar.batt+'%';
+  tag.querySelector('span').textContent=txt;
+  btn.textContent=bleConnecting?T('btn_ble_wait'):on?T('btn_ble_dis'):T('btn_ble_con');
+  btn.disabled=bleConnecting;
+  cal.textContent=T('btn_ble_cal'); cal.style.display=on?'':'none';
+}
+function bleWrite(ch,data){
+  if(!ch||!bleOn())return Promise.resolve();
+  const f=ch.writeValueWithoutResponse?ch.writeValueWithoutResponse.bind(ch):ch.writeValue.bind(ch);
+  bleBusy=true;
+  return f(data).catch(()=>{}).finally(()=>{bleBusy=false});
+}
+function onCollar(dv){
+  if(!dv||dv.byteLength<20)return;
+  const f=dv.getUint8(13);
+  collar={hp:dv.getUint16(0,true)/10, exp:dv.getUint32(2,true), streak:dv.getUint16(6,true),
+    phase:dv.getUint8(8), state:dv.getUint8(9), ang:dv.getUint16(10,true)/10, score:dv.getUint8(12),
+    mission:!!(f&1), dead:!!(f&2), cam:!!(f&4), deadRes:dv.getUint16(14,true),
+    good:dv.getUint16(16,true), batt:dv.getUint8(18)};
+  collarTs=Date.now();
+}
+async function bleOpen(){
+  const srv=await bleDev.gatt.connect();
+  const svc=await srv.getPrimaryService(BLE_SVC);
+  bleAngC=await svc.getCharacteristic(BLE_ANG);
+  bleCmdC=await svc.getCharacteristic(BLE_CMD);
+  const sta=await svc.getCharacteristic(BLE_STA);
+  sta.addEventListener('characteristicvaluechanged',e=>onCollar(e.target.value));
+  await sta.startNotifications();
+  try{ onCollar(await sta.readValue()); }catch(e){}
+  // acerta o relógio do colar (dias/streak funcionam mesmo sem Wi-Fi)
+  const t=Math.floor(Date.now()/1000);
+  await bleWrite(bleCmdC,new Uint8Array([84,t&255,(t>>>8)&255,(t>>>16)&255,(t>>>24)&255]));
+  bleRetry=0;
+}
+async function bleConnect(){
+  if(!navigator.bluetooth){toast(T('ble_nosup'));return}
+  if(bleOn()){ bleUserOff=true; bleDev.gatt.disconnect(); return; }
+  bleConnecting=true; bleUI();
+  try{
+    if(!bleDev){
+      bleDev=await navigator.bluetooth.requestDevice({
+        filters:[{services:[BLE_SVC]},{name:'ErgoGotchi'}], optionalServices:[BLE_SVC]});
+      bleDev.addEventListener('gattserverdisconnected',onBleLost);
+    }
+    bleUserOff=false; collarPrev=null;
+    await bleOpen();
+    toast(T('ble_ok'));
+  }catch(err){
+    if(err&&err.name!=='NotFoundError') toast(T('ble_err')+(err.message||err));
+    if(bleDev&&!bleOn()&&err&&err.name==='NotFoundError') bleDev=null;
+  }
+  bleConnecting=false; bleUI();
+}
+function onBleLost(){
+  bleAngC=bleCmdC=null; collar=null; bleUI();
+  if(bleUserOff){ bleUserOff=false; return; }
+  toast(T('ble_lost'));
+  // tenta religar sozinho durante ~1 minuto (ex.: afastaste-te um pouco)
+  const again=()=>{
+    if(bleOn()||bleUserOff||!bleDev||bleRetry>=12)return;
+    bleRetry++;
+    bleOpen().then(()=>{toast(T('ble_back'));bleUI();}).catch(()=>setTimeout(again,5000));
+  };
+  bleRetry=0; setTimeout(again,3000);
+}
+// o colar manda no jogo enquanto está ligado
+function applyCollar(){
+  const c=collar, p=collarPrev;
+  if(p){
+    if(c.dead&&!p.dead){ G.deaths++; toast(T('death_toast')); gotchiSay('death');
+      if(G.cfg.vib&&navigator.vibrate)navigator.vibrate([400,120,400]); }
+    if(!c.dead&&p.dead){ celebrateUntil=Date.now()+6000; sndSuccess(); toast(T('reborn_toast')); gotchiSay('reborn'); }
+    if(c.mission&&!p.mission){ celebrateUntil=Date.now()+6000; sndSuccess(); gotchiSay('mission'); toast(T('mis_done')); }
+  }
+  G.hp=c.hp; G.exp=c.exp; G.streak=c.streak; G.dead=c.dead; G.deadRes=c.deadRes;
+  G.mission=c.mission; G.goodSecs=c.good; G.hp0Secs=0;
+  collarPrev=c;
+}
+// envia o ângulo da câmara ao colar 2x por segundo
+setInterval(()=>{
+  if(!bleOn()||bleBusy||angleF==null||Date.now()-lastGood>=3000)return;
+  const v=Math.max(0,Math.min(1199,Math.round(angleF*10)));
+  bleWrite(bleAngC,new Uint8Array([v&255,v>>8]));
+},500);
+$('bleTag').onclick=bleConnect;
+$('bleBtn').onclick=bleConnect;
+$('bleCalBtn').onclick=()=>{
+  if(!bleOn())return;
+  toast(T('calib_go'));
+  setTimeout(()=>{ bleWrite(bleCmdC,new Uint8Array([1])).then(()=>toast(T('ble_cal_ok'))); },3000);
+};
+
 const DEATH_SECS=600;    // 10 min com HP a 0 em má postura -> morre
 const RES_SECS=1800;     // 30 min de boa postura -> ressuscita
 function die(){
@@ -860,20 +987,24 @@ function resurrect(){
 setInterval(()=>{
   now1s=Date.now();
   rollDay();
+  const L=bleLinked();                 // colar ligado: o jogo é o do colar
+  if(L) applyCollar();
   const fresh=Date.now()-lastGood<3000;
-  const a=fresh?angleF:null;
+  let a=fresh?angleF:null;
+  if(a==null&&L) a=collar.ang;         // sem câmara: mostra o ângulo do IMU do colar
+  if(L&&$('bleTag')) bleUI();
   const h=new Date().getHours();
 
   // -------- MODO FANTASMA: só a boa postura ressuscita --------
   if(G.dead){
     if(a!=null){
       G.hourTotal[h]++;
-      if(a<G.cfg.ok){ G.deadRes++; G.hourGood[h]++; }
-      else G.deadRes=Math.max(0,G.deadRes-2);
+      if(a<G.cfg.ok){ if(!L)G.deadRes++; G.hourGood[h]++; }
+      else if(!L) G.deadRes=Math.max(0,G.deadRes-2);
       G.hist.push({t:Date.now(),a:Math.round(a*10)/10});
       const cut=Date.now()-6*3600*1000;
       while(G.hist.length&&G.hist[0].t<cut)G.hist.shift();
-      if(G.deadRes>=RES_SECS){ resurrect(); }
+      if(!L&&G.deadRes>=RES_SECS){ resurrect(); }
     }
     gState=Date.now()<celebrateUntil?'celebrate':'ghost';
     $('alertFlash').classList.remove('on');
@@ -886,16 +1017,17 @@ setInterval(()=>{
   else{
     G.hourTotal[h]++;
     if(a<G.cfg.ok){
-      G.hp=Math.min(G.hp+0.5,100); G.exp+=10; G.goodSecs++; G.hourGood[h]++;
+      if(!L){ G.hp=Math.min(G.hp+0.5,100); G.exp+=10; G.goodSecs++; }
+      G.hourGood[h]++;
       st=happyKey(); alertSecs=0;
-      if(!G.mission && G.goodSecs>=1800){
+      if(!L && !G.mission && G.goodSecs>=1800){
         G.mission=true;G.exp+=1000;G.hp=Math.min(G.hp+1,100);
         celebrateUntil=Date.now()+6000; sndSuccess(); gotchiSay('mission'); toast(T('mis_done'));
       }
     }else if(a<G.cfg.warn){
-      G.hp=Math.max(G.hp-0.2,0); st='warning'; alertSecs=0;
+      if(!L)G.hp=Math.max(G.hp-0.2,0); st='warning'; alertSecs=0;
     }else{
-      G.hp=Math.max(G.hp-1,0); st='bad';
+      if(!L)G.hp=Math.max(G.hp-1,0); st='bad';
       if(++alertSecs===8){          // 8 s em crítico = 1 alerta
         G.alerts++; beep();
         if(G.cfg.vib&&navigator.vibrate)navigator.vibrate([180,80,180]);
@@ -905,8 +1037,10 @@ setInterval(()=>{
     const cut=Date.now()-6*3600*1000;
     while(G.hist.length&&G.hist[0].t<cut)G.hist.shift();
     // vida por um fio: HP a 0 e postura má acumula para a morte
-    if(G.hp<=0&&a>=G.cfg.ok){ if(++G.hp0Secs>=DEATH_SECS) die(); }
-    else if(a<G.cfg.ok) G.hp0Secs=0;
+    if(!L){
+      if(G.hp<=0&&a>=G.cfg.ok){ if(++G.hp0Secs>=DEATH_SECS) die(); }
+      else if(a<G.cfg.ok) G.hp0Secs=0;
+    }
   }
   gState=Date.now()<celebrateUntil?'celebrate':st;
   // alertas escalonados por mudança de nível (0=feliz 1=atenção 2=crítico)

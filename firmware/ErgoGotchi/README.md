@@ -1,4 +1,4 @@
-# 🔥 Ergo'Gotchi — Firmware do Colar (v4)
+# 🔥 Ergo'Gotchi — Firmware do Colar (v5)
 
 Firmware Arduino para o **Waveshare ESP32-C6-Touch-AMOLED-1.8** (368×448, SH8601).
 A chama vive da tua postura: HP sobe com ângulo cervical <20°, desce acima de 20° e cai depressa acima de 35°.
@@ -27,6 +27,24 @@ Enquanto é fantasma, o HOME mostra uma barra ciana de progresso ("RENASCER x/30
 má postura faz a barra recuar. Os valores estão em `pin_config.h`
 (para testar depressa, põe `DEATH_SECS 30`).
 
+## ⌚ Ligação à app por Bluetooth (v5)
+
+O colar anuncia-se como **ErgoGotchi**. Na app (Chrome/Edge no PC ou Android)
+carrega em **⌚ COLAR** no topo, ou em Config → **Ligar colar**, e escolhe-o na lista.
+
+- **Um só Gotchi**: enquanto estão ligados, o jogo é o do colar (HP, EXP, streak,
+  fantasma); a app mostra-o e guarda essa cópia.
+- **Câmara → colar**: a app envia o ângulo da câmara 2× por segundo; tem
+  prioridade sobre o IMU durante 10 s.
+- **Relógio**: ao ligar, a app acerta a hora do colar (os dias/streak funcionam sem Wi-Fi).
+- **Calibrar colar** a partir da app (Config), com 3 s para te endireitares.
+- Se a ligação cair, o colar continua sozinho e a app tenta religar durante ~1 min.
+- Não funciona no iPhone nem no Firefox (não suportam Web Bluetooth).
+
+Serviço BLE `e1f0a000-6f2a-4c1e-9b7d-2c0e7a90a001`: `…a001` ângulo (write, uint16 = graus×10),
+`…a002` estado (notify, 20 bytes, 1×/s), `…a003` comandos (write: `1` = calibrar,
+`'T'`+epoch = acertar relógio). Detalhes no topo de `ble_link.h`.
+
 ## Estrutura
 
 | Ficheiro | Função |
@@ -39,6 +57,7 @@ má postura faz a barra recuar. Os valores estão em `pin_config.h`
 | `ui_draw.h` | Render dos 5 ecrãs (textos via `lang.h`) |
 | `lang.h` | Dicionário PT/EN (`TR(K_...)`) |
 | `sound.h` | Sons pelo ES8311 + controlo de volume |
+| `ble_link.h` | Bluetooth (BLE) para ligar à app |
 | `net_link.h` | Servidor HTTP (API local) |
 | `touch_input.h` | Deteção de swipe/tap (FT3168) |
 | `es8311.c/.h`, `es8311_reg.h` | Driver oficial do codec áudio |
@@ -48,6 +67,7 @@ má postura faz a barra recuar. Os valores estão em `pin_config.h`
 
 1. **Placa**: core ESP32 da Espressif v3.x. Seleciona **ESP32C6 Dev Module**,
    Flash Size **16MB**, **USB CDC On Boot: Enabled**.
+   Partition Scheme com app ≥ 3 MB (Wi-Fi + Bluetooth ocupam mais espaço).
 2. **Bibliotecas**: as do repositório oficial da Waveshare
    [`waveshareteam/ESP32-C6-Touch-AMOLED-1.8`](https://github.com/waveshareteam/ESP32-C6-Touch-AMOLED-1.8)
    → copia `examples/Arduino-v3.3.5/libraries/` para `Arduino/libraries/`:

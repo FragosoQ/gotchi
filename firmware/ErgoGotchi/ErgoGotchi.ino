@@ -1,5 +1,5 @@
 // ============================================================
-//  🔥 ERGO-GOTCHI v3 — Colar de Postura
+//  🔥 ERGO-GOTCHI v5 — Colar de Postura
 //  Waveshare ESP32-C6-Touch-AMOLED-1.8 (368x448, SH8601)
 //
 //  "A chama vive da tua postura. Alimenta-a com ergonomia."
@@ -8,6 +8,9 @@
 //      8 estados de sprite, 4 fases de evolução:
 //      EMBER -> SOLARION (30d) -> GUARDIAN (90d) -> PHOENIX (180d)
 //      Missão diária (30 min), histórico horário, modo dormir.
+//
+//  v4: fantasma (morte/ressurreição) + idioma PT/EN.
+//  v5: Bluetooth — a app liga-se ao colar (ble_link.h).
 //
 //  Botão BOOT: calibrar postura "zero".
 //  Bibliotecas: as do repo oficial Waveshare (ver README).
@@ -30,6 +33,7 @@ uint8_t UI_LANG = 0;   // 0=PT 1=EN (persistido em NVS)
 #include "ui_draw.h"
 #include "touch_input.h"
 #include "net_link.h"
+#include "ble_link.h"
 #include "sound.h"
 
 // ---- Hardware ----
@@ -55,6 +59,7 @@ GotchiGame    game;
 GotchiUI      ui(gfx);
 SwipeDetector swipe;
 NetLink       net;
+BleLink       ble;
 GotchiSound   snd;
 
 // ---- Estado da app ----
@@ -111,6 +116,7 @@ void setup() {
   game.begin(prefs);
   if (!imu.begin(prefs)) Serial.println("[!] QMI8658 falhou");
   net.begin(&game, &imu);
+  ble.begin(&game, &imu);             // Bluetooth para a app
   if (!snd.begin(expander)) Serial.println("[!] ES8311/I2S falhou");
 
   // definições guardadas
@@ -268,5 +274,16 @@ void loop() {
   }
 
   net.update();
+  ble.update(lastBatt);
+
+  // ---- Calibração pedida pela app (Bluetooth) ----
+  if (ble.takeCalibrateRequest()) {
+    imu.calibrate();
+    ui.calibDone();
+    if (ui.cfg.som) snd.sndRecover();
+    haptic(80);
+    delay(900);
+    drawScreen();
+  }
   delay(8);
 }
