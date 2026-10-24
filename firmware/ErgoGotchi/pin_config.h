@@ -68,3 +68,7 @@
 
 // --- Deteção de "a dormir" (colar imóvel) ---
 #define SLEEP_STILL_SECS 300   // 5 min sem movimento -> sprite a dormir
+
+// --- Morte e ressurreição (Fase 2 👻) ---
+#define DEATH_SECS 600     // 10 min com HP=0 em má postura -> morre
+#define RES_SECS   1800    // 30 min de boa postura -> ressuscita

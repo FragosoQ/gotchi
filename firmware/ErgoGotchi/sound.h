@@ -87,6 +87,7 @@ public:
   void sndCritical() { for (int i = 0; i < 3; i++) { tone(440, 120, .6f); pause(60); } }
   void sndRecover()  { tone(660, 80, .35f); tone(990, 120, .35f); }
   void sndSuccess()  { tone(659, 90, .5f); tone(784, 90, .5f); tone(1047, 180, .5f); }
+  void sndDeath()    { tone(440, 180, .5f); pause(40); tone(330, 180, .5f); pause(40); tone(220, 380, .55f); }
 
 private:
   I2SClass _i2s;

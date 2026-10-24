@@ -1,20 +1,22 @@
 // ============================================================
-// Ergo-Gotchi — game_logic.h (v3)
-// HP/EXP/streak + FASES DE EVOLUÇÃO + MISSÃO DIÁRIA + HISTÓRICO
+// Ergo-Gotchi — game_logic.h (v4: morte e ressurreição 👻)
 //
-// Fases (dias de streak): Ember 0-29 | Solarion 30-89 |
-//                         Guardian 90-179 | Phoenix 180+
+// Morte: HP a 0 + má postura durante DEATH_SECS -> vira fantasma
+//        (streak a zero, EXP a metade). Boa postura zera o contador.
+// Ressurreição: RES_SECS acumulados de boa postura -> renasce (HP 50).
 // ============================================================
 #pragma once
 #include <Preferences.h>
 #include <time.h>
 #include "pin_config.h"
+#include "lang.h"
 
 // Índices alinhados com SPRITES[] em sprites.h
 enum GotchiState : uint8_t {
   ST_HAPPY = 0, ST_WARNING = 1, ST_BAD = 2,
   ST_SLEEP = 3, ST_CELEBRATE = 4,
-  ST_SOLARION = 5, ST_GUARDIAN = 6, ST_PHOENIX = 7
+  ST_SOLARION = 5, ST_GUARDIAN = 6, ST_PHOENIX = 7,
+  ST_GHOST = 8
 };
 
 class GotchiGame {
@@ -24,10 +26,16 @@ public:
   uint16_t streakDays = 0;
   GotchiState state = ST_HAPPY;
 
-  uint32_t goodSecsToday = 0;      // tempo de boa postura hoje
-  bool     missionDone = false;    // missão diária cumprida
-  bool     eventCelebrate = false; // pedir animação de festa (missão/evolução)
-  uint16_t hourGood[24] = {0};     // segundos bons por hora (histórico)
+  bool     dead = false;           // 👻 modo fantasma
+  uint32_t deadRes = 0;            // segs bons acumulados p/ ressuscitar
+  uint16_t deaths = 0;
+  uint32_t hp0Secs = 0;            // segs seguidos com HP=0 em má postura
+
+  uint32_t goodSecsToday = 0;
+  bool     missionDone = false;
+  bool     eventCelebrate = false; // festa (missão/evolução/ressurreição)
+  bool     eventDeath = false;     // acabou de morrer (som/vibração)
+  uint16_t hourGood[24] = {0};
   uint16_t hourTotal[24] = {0};
 
   void begin(Preferences &prefs) {
@@ -37,11 +45,16 @@ public:
     streakDays    = _prefs->getUShort("streak", 0);
     goodSecsToday = _prefs->getULong ("goodsecs", 0);
     missionDone   = _prefs->getBool  ("mission", false);
+    dead          = _prefs->getBool  ("dead", false);
+    deadRes       = _prefs->getULong ("deadres", 0);
+    deaths        = _prefs->getUShort("deaths", 0);
+    dead          = _prefs->getBool  ("dead", false);
+    deadRes       = _prefs->getULong ("deadres", 0);
+    deaths        = _prefs->getUShort("deaths", 0);
     _lastDay      = _prefs->getUShort("lastday", 0);
     _minHpToday   = hp;
   }
 
-  // ---- Fase de evolução (0=Ember 1=Solarion 2=Guardian 3=Phoenix) ----
   uint8_t phase() const {
     if (streakDays >= 180) return 3;
     if (streakDays >= 90)  return 2;
@@ -61,9 +74,26 @@ public:
     return s[phase()];
   }
 
-  // ---- Tick 1 Hz. sleeping=true congela o jogo (colar pousado/noite) ----
+  // ---- Tick 1 Hz ----
   bool tick(float angle, bool sleeping) {
     GotchiState prev = state;
+
+    // -------- MODO FANTASMA: só a boa postura ressuscita --------
+    if (dead) {
+      state = ST_GHOST;
+      if (!sleeping) {
+        struct tm t; bool ht = getLocalTime(&t, 0);
+        if (ht) hourTotal[t.tm_hour]++;
+        if (angle < ANG_OK) {
+          deadRes++;
+          if (ht) hourGood[t.tm_hour]++;
+          if (deadRes >= RES_SECS) resurrect();
+        } else if (deadRes > 1) deadRes -= 2;
+      }
+      if (++_saveCounter >= 300) { save(); _saveCounter = 0; }
+      return state != prev;
+    }
+
     if (sleeping) { state = ST_SLEEP; return false; }
 
     struct tm t;
@@ -74,23 +104,35 @@ public:
       hp = min(hp + HP_GAIN_OK, 100.0f);
       exp += EXP_PER_SEC;
       goodSecsToday++;
+      hp0Secs = 0;
       if (hh >= 0) hourGood[hh]++;
       state = happySprite();
-      // missão diária cumprida?
       if (!missionDone && goodSecsToday >= MISSION_MIN * 60UL) {
         missionDone = true;
         exp += MISSION_EXP;
         hp = min(hp + 1.0f, 100.0f);
         eventCelebrate = true;
       }
-    } else if (angle < ANG_WARN) {
-      hp = max(hp - HP_LOSS_WARN, 0.0f);
-      state = ST_WARNING;
     } else {
-      hp = max(hp - HP_LOSS_BAD, 0.0f);
-      state = ST_BAD;
+      if (angle < ANG_WARN) { hp = max(hp - HP_LOSS_WARN, 0.0f); state = ST_WARNING; }
+      else                  { hp = max(hp - HP_LOSS_BAD,  0.0f); state = ST_BAD; }
+      // vida por um fio: HP esgotado + má postura acumula para a morte
+      if (hp <= 0.0f && ++hp0Secs >= DEATH_SECS) die();
     }
     if (hh >= 0) hourTotal[hh]++;
+
+    // vida por um fio: HP a 0 e má postura acumula para a morte
+    if (hp <= 0.01f && angle >= ANG_OK) {
+      if (++hp0Secs >= DEATH_SECS) {          // ☠️ morre
+        dead = true; deaths++; hp0Secs = 0; deadRes = 0;
+        streakDays = 0;                       // renasce como Ember
+        exp /= 2;                             // metade da EXP perde-se
+        eventDeath = true;
+        state = ST_GHOST;
+        save();
+        return true;
+      }
+    } else if (angle < ANG_OK) hp0Secs = 0;
 
     _minHpToday = min(_minHpToday, hp);
     checkNewDay(haveTime ? t.tm_yday + 1 : 0);
@@ -100,33 +142,31 @@ public:
   }
 
   uint16_t level() const { return 1 + exp / 20000; }
-
-  // Score ergonómico do dia (0-100)
   uint8_t scoreToday() const {
     uint32_t g = 0, tot = 0;
     for (int i = 0; i < 24; i++) { g += hourGood[i]; tot += hourTotal[i]; }
     return tot ? (uint8_t)(100UL * g / tot) : 100;
   }
-  // Score de uma hora (0-100), 255 = sem dados
   uint8_t hourScore(int h) const {
     return hourTotal[h] ? (uint8_t)(100UL * hourGood[h] / hourTotal[h]) : 255;
   }
 
   const char* stateText() const {
     switch (state) {
-      case ST_WARNING:   return "ATENCAO";
-      case ST_BAD:       return "CRITICO";
-      case ST_SLEEP:     return "A DORMIR";
-      case ST_CELEBRATE: return "FESTA!";
-      case ST_HAPPY:     return "FELIZ";
+      case ST_GHOST:     return TR(K_FANTASMA);
+      case ST_WARNING:   return TR(K_ATENCAO);
+      case ST_BAD:       return TR(K_CRITICO);
+      case ST_SLEEP:     return TR(K_DORMIR);
+      case ST_CELEBRATE: return TR(K_FESTA);
+      case ST_HAPPY:     return TR(K_FELIZ);
       default:           return phaseName();
     }
   }
   const char* postureText(float ang) const {
-    if (ang < ANG_OK * 0.6f) return "Postura Excelente";
-    if (ang < ANG_OK)        return "Postura Boa";
-    if (ang < ANG_WARN)      return "Atencao a Postura";
-    return "Postura Ma";
+    if (ang < ANG_OK * 0.6f) return TR(K_P_EXC);
+    if (ang < ANG_OK)        return TR(K_P_BOA);
+    if (ang < ANG_WARN)      return TR(K_P_AT);
+    return TR(K_P_MA);
   }
 
   void save() {
@@ -135,6 +175,12 @@ public:
     _prefs->putUShort("streak", streakDays);
     _prefs->putULong ("goodsecs", goodSecsToday);
     _prefs->putBool  ("mission", missionDone);
+    _prefs->putBool  ("dead", dead);
+    _prefs->putULong ("deadres", deadRes);
+    _prefs->putUShort("deaths", deaths);
+    _prefs->putBool  ("dead", dead);
+    _prefs->putULong ("deadres", deadRes);
+    _prefs->putUShort("deaths", deaths);
     _prefs->putUShort("lastday", _lastDay);
   }
 
@@ -144,14 +190,31 @@ private:
   uint16_t _lastDay = 0;
   uint16_t _saveCounter = 0;
 
+  void die() {                     // ☠️ apagou-se
+    dead = true; deaths++;
+    deadRes = 0; hp0Secs = 0;
+    streakDays = 0;                // o novo gotchi recomeça em Ember
+    exp /= 2;                      // metade da EXP parte com ele
+    eventDeath = true;
+    save();
+  }
+  void resurrect() {               // 🔥 renasceu
+    dead = false;
+    hp = 50.0f; deadRes = 0; hp0Secs = 0;
+    eventCelebrate = true;
+    save();
+  }
+
   void checkNewDay(uint16_t day) {
-    if (day == 0) return;                 // sem relógio ainda
+    if (day == 0) return;
     if (_lastDay == 0) { _lastDay = day; return; }
     if (day != _lastDay) {
       uint8_t oldPhase = phase();
-      if (_minHpToday >= STREAK_MIN_HP) streakDays++;
-      else                              streakDays = 0;
-      if (phase() != oldPhase) eventCelebrate = true;   // ⭐ evolução!
+      if (!dead) {
+        if (_minHpToday >= STREAK_MIN_HP) streakDays++;
+        else                              streakDays = 0;
+        if (phase() != oldPhase) eventCelebrate = true;
+      }
       _minHpToday = hp;
       _lastDay = day;
       goodSecsToday = 0;

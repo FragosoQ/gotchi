@@ -12,6 +12,7 @@
 #include "sprites.h"
 #include "game_logic.h"
 #include "pin_config.h"
+#include "lang.h"
 
 enum Screen : uint8_t { SCR_HOME = 0, SCR_ANGULO, SCR_MISSAO, SCR_HISTORICO, SCR_CONFIG, SCR_COUNT };
 
@@ -108,22 +109,30 @@ public:
     _gfx->setTextSize(3);
     _gfx->setTextColor(stateColor(g.state));
     centerText(g.stateText(), 248);
-    // barra HP
+    // barra HP (ou de ressurreição, em modo fantasma)
     int bx = 44, bw = LCD_WIDTH - 88, bh = 16, y = 288;
     _gfx->drawRoundRect(bx, y, bw, bh, 8, RGB565_WHITE);
-    uint16_t hpCol = g.hp > 66 ? SPRITE_PALETTE[11] : g.hp > 33 ? SPRITE_PALETTE[2] : SPRITE_PALETTE[5];
-    int fw = (int)((bw - 6) * g.hp / 100.0f);
-    if (fw > 2) _gfx->fillRoundRect(bx + 3, y + 3, fw, bh - 6, 5, hpCol);
     _gfx->setTextSize(2);
     _gfx->setTextColor(RGB565_WHITE);
-    char b1[24]; snprintf(b1, sizeof(b1), "HP %d%%   LVL %u", (int)g.hp, g.level());
+    char b1[36];
+    if (g.dead) {
+      int fw = (int)((bw - 6) * min((float)g.deadRes / RES_SECS, 1.0f));
+      if (fw > 2) _gfx->fillRoundRect(bx + 3, y + 3, fw, bh - 6, 5, SPRITE_PALETTE[14]);
+      snprintf(b1, sizeof(b1), TR(K_REBIRTH),
+               (int)(g.deadRes / 60), (int)(RES_SECS / 60));
+    } else {
+      uint16_t hpCol = g.hp > 66 ? SPRITE_PALETTE[11] : g.hp > 33 ? SPRITE_PALETTE[2] : SPRITE_PALETTE[5];
+      int fw = (int)((bw - 6) * g.hp / 100.0f);
+      if (fw > 2) _gfx->fillRoundRect(bx + 3, y + 3, fw, bh - 6, 5, hpCol);
+      snprintf(b1, sizeof(b1), "HP %d%%   LVL %u", (int)g.hp, g.level());
+    }
     centerText(b1, y + bh + 8);
     // postura + tempo de hoje
     _gfx->setTextColor(stateColor(g.state));
     centerText(g.postureText(ang), 348);
     _gfx->setTextColor(UI_GRAY);
     char b2[24];
-    snprintf(b2, sizeof(b2), "Hoje %luh%02lu",
+    snprintf(b2, sizeof(b2), "%s %luh%02lu", TR(K_HOJE),
              (unsigned long)(g.goodSecsToday / 3600),
              (unsigned long)((g.goodSecsToday % 3600) / 60));
     centerText(b2, 378);
@@ -140,7 +149,7 @@ public:
     clear(); drawHeader(batt, wifi);
     _gfx->setTextSize(3);
     _gfx->setTextColor(RGB565_WHITE);
-    centerText("Angulo Cervical", 52);
+    centerText(TR(K_ANG_T), 52);
     // escala 180°: 180->360 (semicírculo superior), 0..50° de valor
     for (int a = 0; a < 180; a += 5)
       _gfx->fillArc(AG_CX, AG_CY, AG_R1, AG_R2, 180 + a, 180 + a + 5,
@@ -174,9 +183,9 @@ public:
     _gfx->fillRect(0, 330, LCD_WIDTH, 60, RGB565_BLACK);
     _gfx->setTextSize(3);
     _gfx->setTextColor(zoneCol(ang));
-    centerText(ang < ANG_OK * 0.6f ? "Muito Bom" :
-               ang < ANG_OK        ? "Bom" :
-               ang < ANG_WARN      ? "Atencao" : "Mau", 340);
+    centerText(ang < ANG_OK * 0.6f ? TR(K_MTBOM) :
+               ang < ANG_OK        ? TR(K_BOM) :
+               ang < ANG_WARN      ? TR(K_ATEN) : TR(K_MAU), 340);
   }
 
   // ============================================================
@@ -185,12 +194,12 @@ public:
   void drawMissao(GotchiGame &g, uint8_t frame, int batt, bool wifi) {
     clear(); drawHeader(batt, wifi);
     _gfx->setTextSize(3); _gfx->setTextColor(RGB565_WHITE);
-    centerText("Missao Diaria", 48);
+    centerText(TR(K_MIS_T), 48);
     _gfx->setTextSize(2); _gfx->setTextColor(UI_GRAY);
-    char t[32]; snprintf(t, sizeof(t), "Manter postura %d min", MISSION_MIN);
+    char t[40]; snprintf(t, sizeof(t), TR(K_MIS_MANTER), MISSION_MIN);
     centerText(t, 88);
     missaoDynamics(g);
-    drawSprite(g.missionDone ? ST_CELEBRATE : g.happySprite(), frame,
+    drawSprite(g.dead ? ST_GHOST : g.missionDone ? ST_CELEBRATE : g.happySprite(), frame,
                (LCD_WIDTH - 128) / 2, 250, 2);
     drawDots(SCR_MISSAO);
   }
@@ -211,11 +220,11 @@ public:
     _gfx->setTextSize(2);
     if (g.missionDone) {
       _gfx->setTextColor(SPRITE_PALETTE[12]);
-      char r[32]; snprintf(r, sizeof(r), "CUMPRIDA! +%d EXP", MISSION_EXP);
+      char r[40]; snprintf(r, sizeof(r), TR(K_MIS_OK), MISSION_EXP);
       centerText(r, 208);
     } else {
       _gfx->setTextColor(UI_GRAY);
-      char r[32]; snprintf(r, sizeof(r), "Recompensa: +%d EXP", MISSION_EXP);
+      char r[40]; snprintf(r, sizeof(r), TR(K_MIS_REC), MISSION_EXP);
       centerText(r, 208);
     }
   }
@@ -226,7 +235,7 @@ public:
   void drawHistorico(GotchiGame &g, int batt, bool wifi) {
     clear(); drawHeader(batt, wifi);
     _gfx->setTextSize(3); _gfx->setTextColor(RGB565_WHITE);
-    centerText("Historico (Hoje)", 48);
+    centerText(TR(K_HIST_T), 48);
     // últimas 12 horas
     struct tm t; int nowH = getLocalTime(&t, 0) ? t.tm_hour : 11;
     int n = 12, bw = 22, gap = 6;
@@ -263,16 +272,18 @@ public:
   // ECRÃ 5 — CONFIG (linhas tocáveis)
   // ============================================================
   #define CFG_Y0 78
-  #define CFG_ROW_H 70
+  #define CFG_ROW_H 50
   void drawConfig(bool wifi, int batt, const char *ip) {
     clear(); drawHeader(batt, wifi);
     _gfx->setTextSize(3); _gfx->setTextColor(RGB565_WHITE);
-    centerText("Config", 44);
+    centerText(TR(K_CFG_T), 44);
     configRow(0, "Wi-Fi", wifi ? ip : "---", wifi ? SPRITE_PALETTE[11] : UI_GRAY);
     configBrilho();
-    configToggle(2, "Vibracao", cfg.vibra);
-    configToggle(3, "Som", cfg.som);
+    configToggle(2, TR(K_VIBRA), cfg.vibra);
+    configToggle(3, TR(K_SOM), cfg.som);
     configVolume();
+    configRow(5, TR(K_CALIB), ">>", SPRITE_PALETTE[2]);
+    configRow(6, TR(K_IDIOMA), UI_LANG == 0 ? "PT" : "EN", SPRITE_PALETTE[14]);
     drawDots(SCR_CONFIG);
   }
   void configRow(int i, const char *label, const char *val, uint16_t col) {
@@ -280,38 +291,38 @@ public:
     _gfx->drawRoundRect(20, y, LCD_WIDTH - 40, CFG_ROW_H - 12, 10, UI_DGRAY);
     _gfx->setTextSize(2);
     _gfx->setTextColor(RGB565_WHITE);
-    _gfx->setCursor(36, y + 20); _gfx->print(label);
+    _gfx->setCursor(36, y + 16); _gfx->print(label);
     _gfx->setTextColor(col);
     // IPs são compridos: alinha à direita conforme o tamanho
     int w = strlen(val) * 12;
-    _gfx->setCursor(LCD_WIDTH - 44 - w, y + 20); _gfx->print(val);
+    _gfx->setCursor(LCD_WIDTH - 44 - w, y + 16); _gfx->print(val);
   }
   void configBrilho() {
     int i = 1, y = CFG_Y0 + i * CFG_ROW_H;
     _gfx->fillRect(21, y + 1, LCD_WIDTH - 42, CFG_ROW_H - 14, RGB565_BLACK);
     _gfx->drawRoundRect(20, y, LCD_WIDTH - 40, CFG_ROW_H - 12, 10, UI_DGRAY);
     _gfx->setTextSize(2); _gfx->setTextColor(RGB565_WHITE);
-    _gfx->setCursor(36, y + 20); _gfx->print("Brilho");
+    _gfx->setCursor(36, y + 16); _gfx->print(TR(K_BRILHO));
     // [-]  barra  [+]
-    _gfx->setCursor(150, y + 20); _gfx->print("-");
-    _gfx->setCursor(LCD_WIDTH - 52, y + 20); _gfx->print("+");
+    _gfx->setCursor(150, y + 16); _gfx->print("-");
+    _gfx->setCursor(LCD_WIDTH - 52, y + 16); _gfx->print("+");
     int bx = 172, bw = 120, bh = 12;
-    _gfx->drawRoundRect(bx, y + 22, bw, bh, 6, RGB565_WHITE);
+    _gfx->drawRoundRect(bx, y + 18, bw, bh, 6, RGB565_WHITE);
     int fw = (int)((bw - 6) * cfg.brightness / 255.0f);
-    if (fw > 2) _gfx->fillRoundRect(bx + 3, y + 25, fw, bh - 6, 3, SPRITE_PALETTE[2]);
+    if (fw > 2) _gfx->fillRoundRect(bx + 3, y + 21, fw, bh - 6, 3, SPRITE_PALETTE[2]);
   }
   void configVolume() {
     int i = 4, y = CFG_Y0 + i * CFG_ROW_H;
     _gfx->fillRect(21, y + 1, LCD_WIDTH - 42, CFG_ROW_H - 14, RGB565_BLACK);
     _gfx->drawRoundRect(20, y, LCD_WIDTH - 40, CFG_ROW_H - 12, 10, UI_DGRAY);
     _gfx->setTextSize(2); _gfx->setTextColor(RGB565_WHITE);
-    _gfx->setCursor(36, y + 20); _gfx->print("Volume");
-    _gfx->setCursor(150, y + 20); _gfx->print("-");
-    _gfx->setCursor(LCD_WIDTH - 52, y + 20); _gfx->print("+");
+    _gfx->setCursor(36, y + 16); _gfx->print(TR(K_VOL));
+    _gfx->setCursor(150, y + 16); _gfx->print("-");
+    _gfx->setCursor(LCD_WIDTH - 52, y + 16); _gfx->print("+");
     int bx = 172, bw = 120, bh = 12;
-    _gfx->drawRoundRect(bx, y + 22, bw, bh, 6, RGB565_WHITE);
+    _gfx->drawRoundRect(bx, y + 18, bw, bh, 6, RGB565_WHITE);
     int fw = (int)((bw - 6) * cfg.volume / 100.0f);
-    if (fw > 2) _gfx->fillRoundRect(bx + 3, y + 25, fw, bh - 6, 3, SPRITE_PALETTE[14]);
+    if (fw > 2) _gfx->fillRoundRect(bx + 3, y + 21, fw, bh - 6, 3, SPRITE_PALETTE[14]);
   }
 
   void configToggle(int i, const char *label, bool on) {
@@ -319,9 +330,9 @@ public:
     _gfx->fillRect(21, y + 1, LCD_WIDTH - 42, CFG_ROW_H - 14, RGB565_BLACK);
     _gfx->drawRoundRect(20, y, LCD_WIDTH - 40, CFG_ROW_H - 12, 10, UI_DGRAY);
     _gfx->setTextSize(2); _gfx->setTextColor(RGB565_WHITE);
-    _gfx->setCursor(36, y + 20); _gfx->print(label);
+    _gfx->setCursor(36, y + 16); _gfx->print(label);
     // pílula on/off
-    int px = LCD_WIDTH - 110, pw = 64, ph = 30, py = y + 14;
+    int px = LCD_WIDTH - 110, pw = 64, ph = 30, py = y + 5;
     _gfx->fillRoundRect(px, py, pw, ph, ph / 2, on ? SPRITE_PALETTE[11] : UI_DGRAY);
     _gfx->fillCircle(on ? px + pw - ph / 2 : px + ph / 2, py + ph / 2, ph / 2 - 4, RGB565_WHITE);
   }
@@ -335,14 +346,33 @@ public:
       else                   cfg.brightness = min(255, cfg.brightness + 25);
       configBrilho(); return 1;
     }
-    if (row == 2) { cfg.vibra = !cfg.vibra; configToggle(2, "Vibracao", cfg.vibra); return 2; }
-    if (row == 3) { cfg.som  = !cfg.som;  configToggle(3, "Som", cfg.som);       return 3; }
+    if (row == 2) { cfg.vibra = !cfg.vibra; configToggle(2, TR(K_VIBRA), cfg.vibra); return 2; }
+    if (row == 3) { cfg.som  = !cfg.som;  configToggle(3, TR(K_SOM), cfg.som);       return 3; }
     if (row == 4) {                       // volume
       if (x < LCD_WIDTH / 2) cfg.volume = max(0, cfg.volume - 10);
       else                   cfg.volume = min(100, cfg.volume + 10);
       configVolume(); return 4;
     }
+    if (row == 5) return 5;               // calibrar postura
+    if (row == 6) return 6;               // idioma PT/EN
     return 0;
+  }
+
+  // Ecrã de calibração: contagem para o utilizador se endireitar
+  void calibCountdown(int n) {
+    clear();
+    _gfx->setTextSize(3); _gfx->setTextColor(RGB565_WHITE);
+    centerText(TR(K_DIREITO), 140);
+    _gfx->setTextSize(2); _gfx->setTextColor(UI_GRAY);
+    centerText(TR(K_ASSENTE), 184);
+    _gfx->setTextSize(10); _gfx->setTextColor(SPRITE_PALETTE[2]);
+    char b[4]; snprintf(b, sizeof(b), "%d", n);
+    centerText(b, 240);
+  }
+  void calibDone() {
+    clear();
+    _gfx->setTextSize(4); _gfx->setTextColor(SPRITE_PALETTE[11]);
+    centerText(TR(K_CALIBRADO), 200);
   }
 
 private:

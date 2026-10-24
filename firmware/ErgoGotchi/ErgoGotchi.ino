@@ -22,6 +22,8 @@
 #include "XPowersLib.h"
 
 #include "pin_config.h"
+#include "lang.h"
+uint8_t UI_LANG = 0;   // 0=PT 1=EN (persistido em NVS)
 #include "sprites.h"
 #include "game_logic.h"
 #include "imu_posture.h"
@@ -112,6 +114,7 @@ void setup() {
   if (!snd.begin(expander)) Serial.println("[!] ES8311/I2S falhou");
 
   // definições guardadas
+  UI_LANG           = prefs.getUChar("lang", 0);
   ui.cfg.brightness = prefs.getUChar("bright", 220);
   ui.cfg.volume     = prefs.getUChar("vol", 80);
   ui.cfg.vibra      = prefs.getBool("vibra", true);
@@ -127,7 +130,7 @@ void setup() {
   gfx->setTextSize(4); gfx->setTextColor(SPRITE_PALETTE[2]);
   gfx->setCursor(44, 190); gfx->print("ERGO'GOTCHI");
   gfx->setTextSize(2); gfx->setTextColor(RGB565_WHITE);
-  gfx->setCursor(30, 240); gfx->print("A chama vive da tua postura");
+  gfx->setCursor(30, 240); gfx->print(TR(K_SPLASH));
   delay(1400);
 
   lastBatt = battery();
@@ -172,6 +175,25 @@ void loop() {
         snd.setVolume(ui.cfg.volume);
         if (ui.cfg.som && ui.cfg.volume > 0) snd.tone(880, 90, .5f);
       }
+      if (what == 6) {                       // alternar idioma PT/EN
+        UI_LANG ^= 1;
+        prefs.putUChar("lang", UI_LANG);
+        drawScreen();                          // redesenha tudo no novo idioma
+      }
+      if (what == 5) {                       // calibrar com contagem 3-2-1
+        for (int n = 3; n >= 1; n--) {
+          ui.calibCountdown(n);
+          if (ui.cfg.som) snd.tone(660, 70, .35f);
+          uint32_t t0 = millis();
+          while (millis() - t0 < 1000) { imu.update(); delay(10); }
+        }
+        imu.calibrate();
+        ui.calibDone();
+        if (ui.cfg.som) snd.sndRecover();
+        haptic(80);
+        delay(900);
+        drawScreen();                        // volta ao CONFIG
+      }
     }
   }
 
@@ -182,7 +204,13 @@ void loop() {
     bool sleeping = imu.stillFor(SLEEP_STILL_SECS);
     bool changed = game.tick(ang, sleeping);
 
-    if (game.eventCelebrate) {            // missão cumprida / evolução!
+    if (game.eventDeath) {                // ☠️ o gotchi morreu
+      game.eventDeath = false;
+      if (ui.cfg.som) snd.sndDeath();
+      haptic(400, 2);
+      drawScreen();
+    }
+    if (game.eventCelebrate) {            // missão cumprida / evolução / RENASCIMENTO!
       game.eventCelebrate = false;
       celebrateUntil = now + 6000;
       haptic(120, 3);
@@ -227,7 +255,7 @@ void loop() {
     if (screen == SCR_HOME)
       ui.drawSprite(displayState(), frame, (LCD_WIDTH - 192) / 2, 46, 3);
     else if (screen == SCR_MISSAO)
-      ui.drawSprite(millis() < celebrateUntil || game.missionDone ? ST_CELEBRATE : game.happySprite(),
+      ui.drawSprite(game.dead ? ST_GHOST : (millis() < celebrateUntil || game.missionDone) ? ST_CELEBRATE : game.happySprite(),
                     frame, (LCD_WIDTH - 128) / 2, 250, 2);
   }
 
