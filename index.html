@@ -721,12 +721,39 @@ const sndSuccess =()=>{tone(659,.09,.18);tone(784,.09,.18,.1);tone(1047,.18,.18,
 const beep=sndCritical;
 
 /* ---------------- VOZ (Web Speech, pt-PT) ---------------- */
+// escolhe a melhor voz: pt-PT exato (nunca pt-BR se houver alternativa),
+// preferindo vozes "Natural"/online (Edge) e nomes conhecidos de Portugal
+let VOICES=[];
+function loadVoices(){ if(window.speechSynthesis) VOICES=speechSynthesis.getVoices()||[]; }
+if(window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged=loadVoices; }
+function pickVoice(){
+  if(!VOICES.length) loadVoices();
+  const norm=l=>(l||'').toLowerCase().replace('_','-');
+  const score=v=>{
+    const l=norm(v.lang), n=(v.name||'').toLowerCase(); let s=0;
+    if(LANG==='pt'){
+      if(l==='pt-pt') s+=100;
+      else if(/portugal|joana|catarina|duarte|raquel|helia|fernanda|cristiano|inês|ines/.test(n)&&!/bra[sz]il/.test(n)) s+=90;
+      else if(l.startsWith('pt')) s+= (l==='pt-br'||/bra[sz]il/.test(n)) ? 1 : 20;
+      else return -1;
+    } else {
+      if(!l.startsWith('en')) return -1;
+      s+= l==='en-gb'?60 : l==='en-us'?50 : 30;
+    }
+    if(/natural|neural|online|premium|enhanced/.test(n)) s+=10;
+    if(v.localService===false) s+=2;
+    return s;
+  };
+  let best=null,bs=-1;
+  for(const v of VOICES){ const s=score(v); if(s>bs){bs=s;best=v;} }
+  return best;
+}
 function speak(t){
   if(!G.cfg.voz||!window.speechSynthesis)return;
   const u=new SpeechSynthesisUtterance(t);
-  const pref=LANG==='pt'?'pt':'en';
-  const v=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.toLowerCase().startsWith(pref));
-  if(v)u.voice=v; u.lang=LANG==='pt'?'pt-PT':'en-US'; u.rate=1.05;
+  const v=pickVoice();
+  if(v)u.voice=v;
+  u.lang=v?v.lang:(LANG==='pt'?'pt-PT':'en-GB'); u.rate=1.05;
   speechSynthesis.cancel(); speechSynthesis.speak(u);
 }
 
