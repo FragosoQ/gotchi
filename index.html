@@ -325,6 +325,8 @@ nav.bottom .row{display:flex}
       <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button class="btn fire" id="bleBtn">⌚ Ligar colar</button><button class="btn" id="bleCalBtn" style="display:none">Calibrar colar</button></div></div>
     <div class="cfgrow"><label>Voz do Gotchi<small>A chama fala (pt-PT) nos alertas e conselhos</small></label>
       <div class="tog" id="cfgVoz"><i></i></div></div>
+    <div class="cfgrow" id="rowPerso"><label>Personalidade do Gotchi<small>Muda as frases, a voz e o estilo da IA</small></label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:340px"><span id="persoList" style="display:contents"></span><button class="btn" id="persoPlay">▶ Ouvir</button></div></div>
     <div class="cfgrow"><label>Cérebro IA no dispositivo <span id="mlcProg" style="color:var(--green)"></span><small>Modelo de linguagem a correr no browser (WebGPU).<br>Descarrega ~800 MB uma vez e fica guardado — 100% local.</small></label>
       <button class="btn fire" id="mlcBtn">Ativar</button></div>
     <div class="cfgrow"><label>Dados<small>Apaga HP, EXP, histórico e conquistas deste dispositivo</small></label>
@@ -385,9 +387,10 @@ pt:{
  sw_ready:"📦 App pronta para funcionar offline",net_off:"📴 Sem internet — a app continua a funcionar",net_on:"🌐 Ligação restabelecida",
  mlc_no:"❌ Este dispositivo não suporta WebGPU (o cérebro no dispositivo precisa dele).",mlc_dl:"A descarregar...",mlc_ok:"🧠 Cérebro IA ativo no dispositivo!",mlc_say:"Cérebro ligado. Agora penso por mim!",mlc_err:"Erro a carregar o cérebro: ",mlc_ready:"pronto",
  ble_on:"⌚ COLAR ON",ble_off:"⌚ COLAR OFF",cfg_ble:"Colar Ergo'Gotchi (Bluetooth)<small>Liga a app ao colar: um só Gotchi, a câmara envia o ângulo ao colar.<br>Chrome ou Edge no PC/Android.</small>",btn_ble_con:"⌚ Ligar colar",btn_ble_dis:"Desligar colar",btn_ble_cal:"Calibrar colar",btn_ble_wait:"A ligar...",ble_nosup:"Este browser não suporta Bluetooth — usa Chrome ou Edge (PC ou Android).",ble_ok:"⌚ Colar ligado — agora há um só Gotchi (o do colar)",ble_lost:"⌚ Ligação ao colar perdida — o colar continua sozinho",ble_back:"⌚ Colar ligado outra vez",ble_err:"Erro Bluetooth: ",ble_cal_ok:"⌚ Colar calibrado",
+ cfg_perso:"Personalidade do Gotchi<small>Muda as frases, a voz e o estilo da IA</small>",btn_ouvir:"▶ Ouvir",
  voz_on:"Olá! A voz está ligada.",g_ghost:"FANTASMA 👻",death_toast:"👻 O teu Ergo'Gotchi morreu... 30 min de boa postura para o ressuscitar",reborn_toast:"🔥 RENASCEU! A chama está de volta (HP 50)",inst_done:"📲 App instalada!",
  exo_sug:"💪 Sugestão: ",exo_go:" — vai a Coach IA",exo_done:"Feito! Boa!",
- sys_gotchi:"És o Ergo'Gotchi, uma pequena chama tamagotchi que vive da postura do utilizador. Português de Portugal. Responde com UMA frase curta (máximo 14 palavras), divertida, tom de ",
+ sys_gotchi:"És o Ergo'Gotchi, uma pequena chama tamagotchi que vive da postura do utilizador. Português de Portugal. Responde com UMA frase curta (máximo 14 palavras). Personalidade: ",
  sys_coach:"És um coach de ergonomia em português de Portugal. Analisa os dados de postura e responde em 4-6 linhas: 2-3 insights concretos sobre padrões (horas, tendências, padrão dominante) e 1 sugestão prática. Direto, amigável, sem jargão.",
 },
 en:{
@@ -425,9 +428,10 @@ en:{
  sw_ready:"📦 App ready to work offline",net_off:"📴 No internet — the app keeps working",net_on:"🌐 Connection restored",
  mlc_no:"❌ This device doesn't support WebGPU (the on-device brain needs it).",mlc_dl:"Downloading...",mlc_ok:"🧠 AI Brain active on your device!",mlc_say:"Brain online. Now I think for myself!",mlc_err:"Error loading the brain: ",mlc_ready:"ready",
  ble_on:"⌚ COLLAR ON",ble_off:"⌚ COLLAR OFF",cfg_ble:"Ergo'Gotchi collar (Bluetooth)<small>Links the app to the collar: one single Gotchi, the camera sends the angle to the collar.<br>Chrome or Edge on PC/Android.</small>",btn_ble_con:"⌚ Connect collar",btn_ble_dis:"Disconnect collar",btn_ble_cal:"Calibrate collar",btn_ble_wait:"Connecting...",ble_nosup:"This browser doesn't support Bluetooth — use Chrome or Edge (PC or Android).",ble_ok:"⌚ Collar connected — now there is one single Gotchi (the collar's)",ble_lost:"⌚ Collar connection lost — the collar keeps going on its own",ble_back:"⌚ Collar reconnected",ble_err:"Bluetooth error: ",ble_cal_ok:"⌚ Collar calibrated",
+ cfg_perso:"Gotchi personality<small>Changes the lines, the voice and the AI style</small>",btn_ouvir:"▶ Listen",
  voz_on:"Hello! Voice is on.",g_ghost:"GHOST 👻",death_toast:"👻 Your Ergo'Gotchi died... 30 min of good posture to bring it back",reborn_toast:"🔥 REBORN! The flame is back (HP 50)",inst_done:"📲 App installed!",
  exo_sug:"💪 Suggestion: ",exo_go:" — go to AI Coach",exo_done:"Done! Nice!",
- sys_gotchi:"You are Ergo'Gotchi, a small tamagotchi flame that lives on the user's posture. Reply with ONE short sentence (max 14 words), playful, in the tone of ",
+ sys_gotchi:"You are Ergo'Gotchi, a small tamagotchi flame that lives on the user's posture. Reply with ONE short sentence (max 14 words). Personality: ",
  sys_coach:"You are an ergonomics coach. Analyse the posture data and reply in 4-6 lines: 2-3 concrete insights about patterns (hours, trends, dominant pattern) and 1 practical suggestion. Direct, friendly, no jargon.",
 }};
 let LANG=localStorage.getItem('ergogotchi_lang')||((navigator.language||'pt').startsWith('pt')?'pt':'en');
@@ -455,7 +459,7 @@ const LS='ergogotchi_v1';
 const DEF={hp:100,exp:0,streak:0,day:'',goodSecs:0,alerts:0,mission:false,
   hourGood:Array(24).fill(0),hourTotal:Array(24).fill(0),
   ach:{}, days:[], domFlex:0, domFha:0, ergo:{}, dead:false, deadRes:0, deaths:0, hp0Secs:0,
-  cfg:{ok:20,warn:35,som:true,vib:true,voz:true},
+  cfg:{ok:20,warn:35,som:true,vib:true,voz:true,perso:'amigo'},
   hist:[] /* [{t,ang}] por ~5s, máx 6h */ };
 let G = Object.assign({},DEF,JSON.parse(localStorage.getItem(LS)||'{}'));
 G.cfg = Object.assign({},DEF.cfg,G.cfg);
@@ -534,7 +538,7 @@ function applyLang(){
   const lab=id=>{const el=document.getElementById(id);return el&&el.closest('.cfgrow').querySelector('label')};
   lab('cfgOk').innerHTML=T('cfg_ok'); lab('cfgWarn').innerHTML=T('cfg_warn');
   lab('cfgSom').innerHTML=T('cfg_som'); lab('cfgVib').innerHTML=T('cfg_vib');
-  lab('cfgVoz').innerHTML=T('cfg_voz'); lab('mlcBtn').innerHTML=T('cfg_mlc');
+  lab('cfgVoz').innerHTML=T('cfg_voz'); lab('persoPlay').innerHTML=T('cfg_perso'); $('persoPlay').textContent=T('btn_ouvir'); if(typeof renderPerso==='function')renderPerso(); lab('mlcBtn').innerHTML=T('cfg_mlc');
   lab('btnInstall').innerHTML=T('cfg_inst');
   lab('bleBtn').innerHTML=T('cfg_ble'); if(typeof bleUI==='function') bleUI();
   document.querySelector('#rowIOS label').innerHTML=T('cfg_ios');
@@ -767,7 +771,9 @@ function speak(t){
   const u=new SpeechSynthesisUtterance(t);
   const v=pickVoice();
   if(v)u.voice=v;
-  u.lang=v?v.lang:(LANG==='pt'?'pt-PT':'en-GB'); u.rate=1.05;
+  u.lang=v?v.lang:(LANG==='pt'?'pt-PT':'en-GB');
+  const P=(typeof curPerso==='function')?curPerso():null;
+  u.rate=P?P.rate:1.05; u.pitch=P?P.pitch:1;
   speechSynthesis.cancel(); speechSynthesis.speak(u);
 }
 
@@ -797,7 +803,120 @@ en:{
  death:["...I went out. Your posture defeated me...","I'm just smoke now. Rekindle me with good posture...","The flame died. 30 straight minutes bring me back."],
  ghost:["Boo... feed the little ember in my chest...","Keep sitting tall... I feel warmer...","Every good minute rekindles me a little."],
  reborn:["REBORN! The flame is back! 🔥","Back from the dead, hotter than ever!","Thank you! Your posture gave me new life!"]}};
-const PHRASES=new Proxy({},{get:(_,k)=>PHRASES_ALL[LANG][k]});
+/* ---------------- PERSONALIDADES DO COACH ----------------
+   Cada perfil muda as frases, o estilo da IA e o tom da voz.
+   Frases em falta num perfil caem para o "amigo". */
+const PERSO={
+ amigo:{ic:'🔥',name:{pt:'Amigável',en:'Friendly'},pitch:1.05,rate:1.05,
+  llm:{pt:'simpático, caloroso e encorajador',en:'kind, warm and encouraging'},
+  sample:{pt:'Ei, endireita-te um bocadinho! Eu fico mais feliz.',en:"Hey, straighten up a little! It makes me happier."}},
+ sargento:{ic:'🪖',name:{pt:'Sargento',en:'Drill sergeant'},pitch:0.75,rate:1.2,
+  llm:{pt:'sargento militar duro: ordens curtas, em maiúsculas, exigente mas nunca ofensivo',en:'tough drill sergeant: short commands in capitals, demanding but never offensive'},
+  sample:{pt:'COSTAS DIREITAS. JÁ! Isto não é um sofá, recruta!',en:"BACK STRAIGHT. NOW! This is not a couch, recruit!"},
+  phrases:{
+  pt:{greet:["DE PÉ... quer dizer, SENTADO DIREITO! Começa o treino!","Bom dia, recruta. Coluna em sentido!","Inspeção matinal: costas direitas, ombros atrás. JÁ!"],
+   slump:["Estás a descair, recruta! Corrige!","Quem te mandou curvar? ENDIREITA!","Isso é postura de quem desiste. Não aqui!"],
+   bad:["INACEITÁVEL! Costas direitas, AGORA!","Vinte flexões por essa postura! ...Ou endireita-te. JÁ!","Essa coluna é uma vergonha para o pelotão!"],
+   recover:["Assim sim. Não te habitues a elogios.","Melhor. Mantém essa posição!","Finalmente! Continua, soldado!"],
+   praise:["Meia hora sem falhas. Estou quase orgulhoso.","Postura de elite. Não relaxes!","Isso é disciplina! Continua!"],
+   mission:["MISSÃO CUMPRIDA, SOLDADO! +1000 EXP!","Objetivo alcançado. Dispensado... por cinco segundos."],
+   preventive:["Atenção! Hora de risco. Não quero ver desleixo!","É agora que costumas fraquejar. Hoje NÃO!"],
+   exo:["Pausa tática! Exercício, JÁ!","Levanta-te e mexe esse pescoço. É uma ordem!"],
+   death:["Baixa em combate. A tua postura abateu-me.","Morri em serviço por culpa dessa coluna!","Fim da linha. 30 minutos direitos para me trazeres de volta. MARCHE!"],
+   ghost:["Até morto te dou ordens: COSTAS DIREITAS!","Fantasma em serviço. Continua a corrigir!","Cada minuto direito conta. Não pares!"],
+   reborn:["DE VOLTA AO ATIVO! Bom trabalho, recruta!","Ressuscitei. Agora não me voltes a matar!","O pelotão está completo outra vez! Em frente!"]},
+  en:{greet:["UP... I mean, SIT UP STRAIGHT! Training starts now!","Morning, recruit. Spine at attention!","Morning inspection: back straight, shoulders back. NOW!"],
+   slump:["You're slipping, recruit! Fix it!","Who told you to slouch? STRAIGHTEN UP!","That's a quitter's posture. Not here!"],
+   bad:["UNACCEPTABLE! Back straight, NOW!","Twenty push-ups for that posture! ...Or sit up. NOW!","That spine is a disgrace to the platoon!"],
+   recover:["That's it. Don't get used to compliments.","Better. Hold that position!","Finally! Carry on, soldier!"],
+   praise:["Half an hour, no mistakes. I'm almost proud.","Elite posture. Don't relax!","That's discipline! Keep going!"],
+   mission:["MISSION ACCOMPLISHED, SOLDIER! +1000 EXP!","Objective reached. Dismissed... for five seconds."],
+   preventive:["Attention! Risk hour. I don't want to see slacking!","This is when you usually crack. NOT today!"],
+   exo:["Tactical break! Exercise, NOW!","On your feet and move that neck. That's an order!"],
+   death:["Casualty. Your posture took me down.","I died on duty because of that spine!","End of the line. 30 straight minutes to bring me back. MARCH!"],
+   ghost:["Even dead I give orders: BACK STRAIGHT!","Ghost on duty. Keep correcting!","Every straight minute counts. Don't stop!"],
+   reborn:["BACK ON ACTIVE DUTY! Good work, recruit!","I'm back. Now don't kill me again!","The platoon is complete again! Forward!"]}}},
+ sarcastico:{ic:'😏',name:{pt:'Sarcástico',en:'Sarcastic'},pitch:0.95,rate:0.95,
+  llm:{pt:'sarcástico e irónico, humor seco, nunca cruel',en:'sarcastic and ironic, dry humour, never cruel'},
+  sample:{pt:'Lindo. Estás a ensaiar para ponto de interrogação?',en:"Lovely. Rehearsing to become a question mark?"},
+  phrases:{
+  pt:{greet:["Oh, voltaste. Vamos ver quanto tempo dura a coluna hoje.","Bom dia. As minhas expectativas estão no chão. Tal como a tua cabeça.","Mais um dia, mais uma oportunidade de me ignorares."],
+   slump:["Interessante. Estás a tentar tocar no teclado com o nariz?","Ah, o famoso modo camarão. Clássico.","Descair assim é um talento. Pena ser este."],
+   bad:["Lindo. Estás a ensaiar para ponto de interrogação?","Fantástico, o teu fisioterapeuta agradece o negócio.","Essa postura devia vir com aviso de saúde pública."],
+   recover:["Olha quem decidiu ser vertebrado outra vez.","Uau, uma coluna. Quem diria.","Milagre! A gravidade perdeu uma."],
+   praise:["Meia hora direito. Estou chocado, sinceramente.","Quem és tu e o que fizeste ao meu utilizador?","Continua assim e vou ter de rever a minha opinião. Talvez."],
+   mission:["Missão cumprida. Vou marcar no calendário este dia raro.","Conseguiste! Afinal havia esperança. Pouca, mas havia."],
+   preventive:["Ora, a hora em que costumas desabar. Surpreende-me.","Hora de risco. Aposto um HP em como te curvas."],
+   exo:["Que tal um exercício? Ou continuas a fazer de gárgula?","Pausa. O teu pescoço pediu-me, por escrito."],
+   death:["Bem, morri. Espero que esse vídeo valesse a pena.","Parabéns, conseguiste apagar uma chama. Com a coluna.","Sou fumo agora. Muito obrigado, a sério."],
+   ghost:["Assombrar-te-ei até te endireitares. Sem pressa, eu tenho a eternidade.","Buu. Sim, ainda estou morto. Continua.","Cada minuto direito aquece-me. Quem diria que te importavas."],
+   reborn:["Ressuscitei. Não te habitues a milagres.","Voltei! Tenta não me matar antes do almoço.","Vida nova. Vamos ver quanto tempo me deixas viver."]},
+  en:{greet:["Oh, you're back. Let's see how long the spine lasts today.","Morning. My expectations are on the floor. Like your head.","Another day, another chance to ignore me."],
+   slump:["Interesting. Trying to type with your nose?","Ah, the famous shrimp mode. Classic.","Slouching like that is a talent. Shame it's this one."],
+   bad:["Lovely. Rehearsing to become a question mark?","Fantastic, your physio thanks you for the business.","That posture should come with a public health warning."],
+   recover:["Look who decided to be a vertebrate again.","Wow, a spine. Who knew.","A miracle! Gravity lost one."],
+   praise:["Half an hour upright. Honestly shocked.","Who are you and what have you done with my user?","Keep this up and I'll have to revise my opinion. Maybe."],
+   mission:["Mission complete. Marking this rare day on the calendar.","You did it! There was hope after all. Not much, but some."],
+   preventive:["Ah, the hour you usually collapse. Surprise me.","Risk hour. I'll bet one HP you slouch."],
+   exo:["How about an exercise? Or keep playing gargoyle?","Break. Your neck asked me. In writing."],
+   death:["Well, I died. Hope that video was worth it.","Congrats, you put out a flame. With your spine.","I'm smoke now. Thanks a lot, really."],
+   ghost:["I'll haunt you until you sit up. No rush, I have eternity.","Boo. Yes, still dead. Carry on.","Every straight minute warms me. Who knew you cared."],
+   reborn:["I'm back. Don't get used to miracles.","Alive again! Try not to kill me before lunch.","New life. Let's see how long you let me keep it."]}}},
+ piadolas:{ic:'🤡',name:{pt:'Piadolas',en:'Jokester'},pitch:1.3,rate:1.1,
+  llm:{pt:'piadolas: trocadilhos e piadas leves sobre postura, fogo e colunas',en:'jokester: puns and light jokes about posture, fire and spines'},
+  sample:{pt:'Essa postura está tão torta que até o GPS se perdeu!',en:"That posture is so crooked even the GPS got lost!"},
+  phrases:{
+  pt:{greet:["Bom dia! Hoje estou a arder de vontade!","Olá! Pronto para uma postura de chama-r a atenção?","A chama chegou! Quem quer uma coluna em brasa?"],
+   slump:["Estás a descair... queres que chame os bombeiros?","Cuidado, estás mais inclinado que a Torre de Pisa!","Essa postura está a pedir um corretor... ortográfico e ortopédico!"],
+   bad:["Essa postura está tão torta que até o GPS se perdeu!","Socorro! Estou a ficar mais apagado que vela em dia de vento!","Se continuas assim, viro churrasco... mas sem o grelhador!"],
+   recover:["Isso! Agora sim, estás na linha... reta!","Boa! Voltei a ser uma chama de primeira!","Endireitaste! Mereces um aplauso... e uma salsicha grelhada!"],
+   praise:["Meia hora direito! Estás a pegar fogo... no bom sentido!","Que coluna! Até o Partenon tem inveja!","Postura tão boa que devia ter fã-clube!"],
+   mission:["MISSÃO CUMPRIDA! Estou mais quente que pão acabado de sair do forno!","Conseguiste! Isto merece fogo de artifício!"],
+   preventive:["Lá vem a hora fatídica... segura-te às costas!","Hora de risco! Não me faças virar fósforo usado."],
+   exo:["Hora de exercício! Vamos pôr esse pescoço a dançar!","Pausa! Até as chamas precisam de alongar."],
+   death:["Apaguei-me... agora sou só uma piada de fumo.","Fui-me! Morri de rir... não, foi da tua postura.","Virei cinza. Pelo menos combino com o teu humor de segunda-feira."],
+   ghost:["Buu! Sou um fantasma... de chama. Um fantasminha!","Estou morto, mas a piada continua viva!","Endireita-te e eu volto. Promessa de fantasma!"],
+   reborn:["RENASCI! Como fénix... mas mais gira!","Voltei! Diz que sim, que tinhas saudades!","De volta! Mais quente que conversa de café!"]},
+  en:{greet:["Morning! I'm fired up today!","Hello! Ready for some flaming good posture?","The flame is here! Who wants a red-hot spine?"],
+   slump:["You're slipping... should I call the fire brigade?","Careful, you're leaning more than the Tower of Pisa!","That posture needs a spell-checker... and a back-checker!"],
+   bad:["That posture is so crooked even the GPS got lost!","Help! I'm going out like a candle in a storm!","Keep this up and I'm barbecue... without the grill!"],
+   recover:["Yes! Now you're toeing the line... a straight one!","Nice! I'm a first-class flame again!","You straightened up! You deserve applause... and a grilled sausage!"],
+   praise:["Half an hour upright! You're on fire... the good kind!","What a spine! Even the Parthenon is jealous!","Posture so good it should have a fan club!"],
+   mission:["MISSION COMPLETE! I'm hotter than fresh bread!","You did it! This calls for fireworks!"],
+   preventive:["Here comes the fateful hour... hold on to your back!","Risk hour! Don't turn me into a used match."],
+   exo:["Exercise time! Let's make that neck dance!","Break! Even flames need to stretch."],
+   death:["I went out... now I'm just a smoky joke.","I'm gone! Died laughing... no, it was your posture.","I'm ashes. At least I match your Monday mood."],
+   ghost:["Boo! I'm a ghost... of a flame. A wee ghostie!","I'm dead, but the joke lives on!","Sit up and I'll come back. Ghost's promise!"],
+   reborn:["REBORN! Like a phoenix... but cuter!","I'm back! Admit it, you missed me!","Back! Hotter than office gossip!"]}}},
+ zen:{ic:'🧘',name:{pt:'Zen',en:'Zen'},pitch:0.9,rate:0.82,
+  llm:{pt:'mestre zen calmo: frases suaves sobre respiração, presença e equilíbrio',en:'calm zen master: gentle lines about breath, presence and balance'},
+  sample:{pt:'Respira... alonga a coluna... volta ao centro.',en:"Breathe... lengthen your spine... return to centre."},
+  phrases:{
+  pt:{greet:["Bom dia. Inspira... e senta-te com intenção.","A chama acorda contigo. Começa com uma respiração profunda.","Hoje, a coluna é o teu caminho."],
+   slump:["Repara no teu corpo... estás a afastar-te do centro.","Uma respiração... e volta a crescer para cima.","Sem pressa. Só nota a curva e solta-a."],
+   bad:["Respira... alonga a coluna... volta ao centro.","O pescoço carrega o mundo. Devolve-lhe o equilíbrio.","A chama treme quando te curvas. Encontra a tua raiz."],
+   recover:["Assim. O fogo acalma quando estás alinhado.","Bem-vindo de volta ao centro.","Equilíbrio reencontrado. Respira."],
+   praise:["Meia hora em harmonia. A chama agradece.","A tua postura é serena como um lago.","Presença e alinhamento. Belo caminho."],
+   mission:["Missão cumprida. Sente a energia no peito. 🔥","O hábito floresce. +1000 EXP de paz."],
+   preventive:["Esta hora costuma ser difícil. Observa-te com gentileza.","Hora de risco. Uma respiração consciente protege-te."],
+   exo:["Um momento para o corpo. Movimentos lentos.","Pausa. Alonga devagar, respira fundo."],
+   death:["A chama apagou-se. Tudo é impermanente... até isto.","Fiz-me fumo. Com paciência, voltarei.","O fogo descansa. Trinta minutos de presença acendem-no."],
+   ghost:["Sou brisa agora. Senta-te direito e sente-me aquecer.","Cada minuto alinhado é uma brasa que volta.","Paciência. O renascimento vem da constância."],
+   reborn:["Renasci. Do fumo nasce de novo a chama.","O ciclo completa-se. Bem-vindo de volta.","A luz regressa. Obrigado pela tua constância."]},
+  en:{greet:["Good morning. Breathe in... and sit with intention.","The flame wakes with you. Begin with a deep breath.","Today, your spine is your path."],
+   slump:["Notice your body... you're drifting from centre.","One breath... and grow upward again.","No rush. Just notice the curve and let it go."],
+   bad:["Breathe... lengthen your spine... return to centre.","Your neck carries the world. Give it back its balance.","The flame trembles when you bend. Find your root."],
+   recover:["Like that. The fire calms when you're aligned.","Welcome back to centre.","Balance found again. Breathe."],
+   praise:["Half an hour in harmony. The flame is grateful.","Your posture is calm as a lake.","Presence and alignment. A beautiful path."],
+   mission:["Mission complete. Feel the energy in your chest. 🔥","The habit blossoms. +1000 EXP of peace."],
+   preventive:["This hour is often hard. Observe yourself kindly.","Risk hour. One mindful breath protects you."],
+   exo:["A moment for the body. Slow movements.","Pause. Stretch slowly, breathe deeply."],
+   death:["The flame went out. All is impermanent... even this.","I became smoke. With patience, I'll return.","The fire rests. Thirty minutes of presence relight it."],
+   ghost:["I am a breeze now. Sit tall and feel me warm.","Each aligned minute is an ember returning.","Patience. Rebirth comes from consistency."],
+   reborn:["Reborn. From smoke, the flame rises again.","The cycle completes. Welcome back.","The light returns. Thank you for your consistency."]}}}
+};
+function curPerso(){return PERSO[G.cfg.perso]||PERSO.amigo}
+const PHRASES=new Proxy({},{get:(_,k)=>{const P=curPerso().phrases;return (P&&P[LANG]&&P[LANG][k])||PHRASES_ALL[LANG][k]}});
 let lastSay=0;
 async function gotchiSay(ev,ctx=''){
   const now=Date.now();
@@ -809,7 +928,7 @@ async function gotchiSay(ev,ctx=''){
     try{
       const fase=PHASES[phase()][0];
       const r=await askBrain([
-        {role:'system',content:T('sys_gotchi')+fase+'.'},
+        {role:'system',content:T('sys_gotchi')+curPerso().llm[LANG]+(LANG==='pt'?'. Fase atual: ':'. Current stage: ')+fase+'.'},
         {role:'user',content:(LANG==='pt'?'Evento: ':'Event: ')+ev+(LANG==='pt'?'. Contexto: ':'. Context: ')+ctx}],40);
       if(r)line=r.trim().slice(0,120);
     }catch(e){}
@@ -1226,6 +1345,23 @@ function renderAch(){
 $('cfgOk').value=G.cfg.ok; $('cfgWarn').value=G.cfg.warn;
 $('cfgVoz').classList.toggle('on',G.cfg.voz);
 $('cfgVoz').onclick=()=>{G.cfg.voz=!G.cfg.voz;$('cfgVoz').classList.toggle('on',G.cfg.voz);save();if(G.cfg.voz)speak(T('voz_on'))};
+function renderPerso(){
+  const box=$('persoList'); box.innerHTML='';
+  for(const id in PERSO){
+    const P=PERSO[id], b=document.createElement('button');
+    b.className='langb'+(curPerso()===P?' on':''); b.textContent=P.ic+' '+P.name[LANG];
+    b.onclick=()=>{G.cfg.perso=id; save(); renderPerso(); playPerso();};
+    box.appendChild(b);
+  }
+}
+function playPerso(){
+  const line=curPerso().sample[LANG];
+  const bb=$('bubble'); bb.textContent=line; bb.classList.add('on');
+  clearTimeout(bb._t); bb._t=setTimeout(()=>bb.classList.remove('on'),6000);
+  const was=G.cfg.voz; G.cfg.voz=true; speak(line); G.cfg.voz=was;   // o exemplo ouve-se sempre
+}
+$('persoPlay').onclick=playPerso;
+renderPerso();
 $('cfgSom').classList.toggle('on',G.cfg.som); $('cfgVib').classList.toggle('on',G.cfg.vib);
 $('cfgOk').onchange=e=>{G.cfg.ok=+e.target.value;save()};
 $('cfgWarn').onchange=e=>{G.cfg.warn=+e.target.value;save()};
@@ -1318,7 +1454,7 @@ $('coachBtn').onclick=async()=>{
       habitosDetetados:G.ergo},
       ultimos7dias:G.days.slice(-7),horasRisco:riskHours(),fase:PHASES[phase()][0],streak:G.streak};
     const r=await askBrain([
-      {role:'system',content:T('sys_coach')},
+      {role:'system',content:T('sys_coach')+(LANG==='pt'?' Estilo: ':' Style: ')+curPerso().llm[LANG]+'.'},
       {role:'user',content:JSON.stringify(ctx)}],400);
     out.textContent=r||'Sem resposta do modelo.';
   }catch(e){out.textContent=T('coach_err')+e.message}
