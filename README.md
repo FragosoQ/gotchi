@@ -30,6 +30,10 @@ opcional (ESP32-C6 + AMOLED 1.8") mede o ângulo cervical com IMU.
 - **PWA instalável**: botão "Instalar" no Chrome/Edge; no iPhone, Partilhar →
   "Adicionar ao ecrã principal". Funciona offline depois da primeira visita
 
+| Feliz | Evoluído | 👻 Fantasma |
+|:---:|:---:|:---:|
+| <img src="assets/gotchi_happy.gif" width="128"> | <img src="assets/gotchi_evo.gif" width="128"> | <img src="assets/gotchi_ghost.gif" width="128"> |
+
 > A instalação PWA e a câmara no telemóvel exigem HTTPS — por isso a app corre
 > no GitHub Pages e não a partir do ficheiro aberto localmente.
 
