@@ -43,7 +43,17 @@ carrega em **⌚ COLAR** no topo, ou em Config → **Ligar colar**, e escolhe-o 
 
 Serviço BLE `e1f0a000-6f2a-4c1e-9b7d-2c0e7a90a001`: `…a001` ângulo (write, uint16 = graus×10),
 `…a002` estado (notify, 20 bytes, 1×/s), `…a003` comandos (write: `1` = calibrar,
-`'T'`+epoch = acertar relógio). Detalhes no topo de `ble_link.h`.
+`'T'`+epoch = acertar relógio, `'R'` = ler dados guardados, `'W'`+tamanho = enviar dados).
+`…a004` dados da app (write+notify, pacotes de 20 B). Detalhes no topo de `ble_link.h`.
+
+### Dados guardados no colar (v6)
+
+Com a app ligada, o resumo diário, as conquistas e as estatísticas por hora ficam
+guardados num ficheiro na flash do colar (`/appdata.bin`, JSON comprimido, máx. 16 KB).
+Ao ligar, os dados do colar prevalecem sobre os da app; se o colar estiver vazio, a app
+envia os seus. Sem colar, a app guarda tudo no `localStorage`. O histórico de ângulos
+(6 h) fica só na app. Precisa de uma partição de ficheiros (ver Instalação); sem ela o
+colar avisa a app e tudo continua a funcionar só na app.
 
 ## Estrutura
 
@@ -58,6 +68,7 @@ Serviço BLE `e1f0a000-6f2a-4c1e-9b7d-2c0e7a90a001`: `…a001` ângulo (write, u
 | `lang.h` | Dicionário PT/EN (`TR(K_...)`) |
 | `sound.h` | Sons pelo ES8311 + controlo de volume |
 | `ble_link.h` | Bluetooth (BLE) para ligar à app |
+| `app_store.h`, `store_proto.h` | Ficheiro com os dados da app (FFat/LittleFS) e transporte em pacotes |
 | `net_link.h` | Servidor HTTP (API local) |
 | `touch_input.h` | Deteção de swipe/tap (FT3168) |
 | `es8311.c/.h`, `es8311_reg.h` | Driver oficial do codec áudio |
@@ -67,7 +78,9 @@ Serviço BLE `e1f0a000-6f2a-4c1e-9b7d-2c0e7a90a001`: `…a001` ângulo (write, u
 
 1. **Placa**: core ESP32 da Espressif v3.x. Seleciona **ESP32C6 Dev Module**,
    Flash Size **16MB**, **USB CDC On Boot: Enabled**.
-   Partition Scheme com app ≥ 3 MB (Wi-Fi + Bluetooth ocupam mais espaço).
+   Partition Scheme com app ≥ 3 MB **e partição de ficheiros**, por exemplo
+   **16M Flash (3MB APP/9.9MB FATFS)** (Wi-Fi + Bluetooth ocupam mais espaço; a partição
+   de ficheiros guarda os dados da app). Mudar o esquema obriga a reflashar por USB.
 2. **Bibliotecas**: as do repositório oficial da Waveshare
    [`waveshareteam/ESP32-C6-Touch-AMOLED-1.8`](https://github.com/waveshareteam/ESP32-C6-Touch-AMOLED-1.8)
    → copia `examples/Arduino-v3.3.5/libraries/` para `Arduino/libraries/`:

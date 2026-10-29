@@ -11,6 +11,8 @@
 //
 //  v4: fantasma (morte/ressurreição) + idioma PT/EN.
 //  v5: Bluetooth — a app liga-se ao colar (ble_link.h).
+//  v6: com a app ligada, resumo diário/conquistas/horas ficam guardados
+//      no colar (app_store.h, store_proto.h).
 //
 //  Botão BOOT: calibrar postura "zero".
 //  Bibliotecas: as do repo oficial Waveshare (ver README).

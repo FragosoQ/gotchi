@@ -386,7 +386,7 @@ pt:{
  mis_done:"🔥 Missão diária cumprida! +1000 EXP",conq:"Conquista: ",
  sw_ready:"📦 App pronta para funcionar offline",net_off:"📴 Sem internet — a app continua a funcionar",net_on:"🌐 Ligação restabelecida",
  mlc_no:"❌ Este dispositivo não suporta WebGPU (o cérebro no dispositivo precisa dele).",mlc_dl:"A descarregar...",mlc_ok:"🧠 Cérebro IA ativo no dispositivo!",mlc_say:"Cérebro ligado. Agora penso por mim!",mlc_err:"Erro a carregar o cérebro: ",mlc_ready:"pronto",
- ble_on:"⌚ COLAR ON",ble_off:"⌚ COLAR OFF",cfg_ble:"Colar Ergo'Gotchi (Bluetooth)<small>Liga a app ao colar: um só Gotchi, a câmara envia o ângulo ao colar.<br>Chrome ou Edge no PC/Android.</small>",btn_ble_con:"⌚ Ligar colar",btn_ble_dis:"Desligar colar",btn_ble_cal:"Calibrar colar",btn_ble_wait:"A ligar...",ble_nosup:"Este browser não suporta Bluetooth — usa Chrome ou Edge (PC ou Android).",ble_ok:"⌚ Colar ligado — agora há um só Gotchi (o do colar)",ble_lost:"⌚ Ligação ao colar perdida — o colar continua sozinho",ble_back:"⌚ Colar ligado outra vez",ble_err:"Erro Bluetooth: ",ble_cal_ok:"⌚ Colar calibrado",
+ ble_on:"⌚ COLAR ON",ble_off:"⌚ COLAR OFF",cfg_ble:"Colar Ergo'Gotchi (Bluetooth)<small>Liga a app ao colar: um só Gotchi, a câmara envia o ângulo ao colar.<br>Chrome ou Edge no PC/Android.</small>",btn_ble_con:"⌚ Ligar colar",btn_ble_dis:"Desligar colar",btn_ble_cal:"Calibrar colar",btn_ble_wait:"A ligar...",ble_nosup:"Este browser não suporta Bluetooth — usa Chrome ou Edge (PC ou Android).",ble_ok:"⌚ Colar ligado — agora há um só Gotchi (o do colar)",ble_lost:"⌚ Ligação ao colar perdida — o colar continua sozinho",ble_back:"⌚ Colar ligado outra vez",ble_err:"Erro Bluetooth: ",ble_cal_ok:"⌚ Colar calibrado",sto_load:"💾 Dados carregados do colar",sto_first:"💾 Dados da app guardados no colar",sto_off:"💾 O colar não tem espaço de ficheiros — os dados ficam só na app",sto_err:"💾 Não consegui sincronizar os dados com o colar",
  cfg_perso:"Personalidade do Gotchi<small>Muda as frases, a voz e o estilo da IA</small>",btn_ouvir:"▶ Ouvir",
  voz_on:"Olá! A voz está ligada.",g_ghost:"FANTASMA 👻",death_toast:"👻 O teu Ergo'Gotchi morreu... 30 min de boa postura para o ressuscitar",reborn_toast:"🔥 RENASCEU! A chama está de volta (HP 50)",inst_done:"📲 App instalada!",
  exo_sug:"💪 Sugestão: ",exo_go:" — vai a Coach IA",exo_done:"Feito! Boa!",
@@ -427,7 +427,7 @@ en:{
  mis_done:"🔥 Daily mission complete! +1000 EXP",conq:"Achievement: ",
  sw_ready:"📦 App ready to work offline",net_off:"📴 No internet — the app keeps working",net_on:"🌐 Connection restored",
  mlc_no:"❌ This device doesn't support WebGPU (the on-device brain needs it).",mlc_dl:"Downloading...",mlc_ok:"🧠 AI Brain active on your device!",mlc_say:"Brain online. Now I think for myself!",mlc_err:"Error loading the brain: ",mlc_ready:"ready",
- ble_on:"⌚ COLLAR ON",ble_off:"⌚ COLLAR OFF",cfg_ble:"Ergo'Gotchi collar (Bluetooth)<small>Links the app to the collar: one single Gotchi, the camera sends the angle to the collar.<br>Chrome or Edge on PC/Android.</small>",btn_ble_con:"⌚ Connect collar",btn_ble_dis:"Disconnect collar",btn_ble_cal:"Calibrate collar",btn_ble_wait:"Connecting...",ble_nosup:"This browser doesn't support Bluetooth — use Chrome or Edge (PC or Android).",ble_ok:"⌚ Collar connected — now there is one single Gotchi (the collar's)",ble_lost:"⌚ Collar connection lost — the collar keeps going on its own",ble_back:"⌚ Collar reconnected",ble_err:"Bluetooth error: ",ble_cal_ok:"⌚ Collar calibrated",
+ ble_on:"⌚ COLLAR ON",ble_off:"⌚ COLLAR OFF",cfg_ble:"Ergo'Gotchi collar (Bluetooth)<small>Links the app to the collar: one single Gotchi, the camera sends the angle to the collar.<br>Chrome or Edge on PC/Android.</small>",btn_ble_con:"⌚ Connect collar",btn_ble_dis:"Disconnect collar",btn_ble_cal:"Calibrate collar",btn_ble_wait:"Connecting...",ble_nosup:"This browser doesn't support Bluetooth — use Chrome or Edge (PC or Android).",ble_ok:"⌚ Collar connected — now there is one single Gotchi (the collar's)",ble_lost:"⌚ Collar connection lost — the collar keeps going on its own",ble_back:"⌚ Collar reconnected",ble_err:"Bluetooth error: ",ble_cal_ok:"⌚ Collar calibrated",sto_load:"💾 Data loaded from the collar",sto_first:"💾 App data saved to the collar",sto_off:"💾 The collar has no file storage — data stays in the app only",sto_err:"💾 Could not sync data with the collar",
  cfg_perso:"Gotchi personality<small>Changes the lines, the voice and the AI style</small>",btn_ouvir:"▶ Listen",
  voz_on:"Hello! Voice is on.",g_ghost:"GHOST 👻",death_toast:"👻 Your Ergo'Gotchi died... 30 min of good posture to bring it back",reborn_toast:"🔥 REBORN! The flame is back (HP 50)",inst_done:"📲 App installed!",
  exo_sug:"💪 Suggestion: ",exo_go:" — go to AI Coach",exo_done:"Done! Nice!",
@@ -462,6 +462,7 @@ const DEF={hp:100,exp:0,streak:0,day:'',goodSecs:0,alerts:0,mission:false,
   cfg:{ok:20,warn:35,som:true,vib:true,voz:true,perso:'amigo'},
   hist:[] /* [{t,ang}] por ~5s, máx 6h */ };
 let G = Object.assign({},DEF,JSON.parse(localStorage.getItem(LS)||'{}'));
+let storeDirty=false;   // há dados novos para enviar ao colar (ver stoUpload)
 G.cfg = Object.assign({},DEF.cfg,G.cfg);
 const save=()=>localStorage.setItem(LS,JSON.stringify(G));
 
@@ -493,7 +494,7 @@ function rollDay(){
     if(G.days.length>60)G.days.shift();
   }
   G.day=today(); G.goodSecs=0; G.alerts=0; G.mission=false; G.domFlex=0; G.domFha=0; G.ergo={};
-  G.hourGood.fill(0); G.hourTotal.fill(0); save();
+  G.hourGood.fill(0); G.hourTotal.fill(0); storeDirty=true; save();
 }
 function dayTotal(){return G.hourTotal.reduce((a,b)=>a+b,0)}
 function score(){const t=dayTotal();return t?Math.round(100*G.hourGood.reduce((a,b)=>a+b,0)/t):100}
@@ -1021,7 +1022,115 @@ function onCollar(dv){
     good:dv.getUint16(16,true), batt:dv.getUint8(18)};
   collarTs=Date.now();
 }
-async function bleOpen(){
+
+/* ---- Dados no colar (resumo diário, conquistas, estatísticas por hora) ----
+   Com o colar ligado, estes dados ficam guardados no colar (ficheiro na flash)
+   e o colar prevalece sobre os dados locais da app. Sem colar: localStorage.
+   O colar não interpreta o bloco: recebe JSON comprimido (gzip). Protocolo em
+   firmware/ErgoGotchi/store_proto.h (pacotes de 20 B: 'D'+seq u16+17 B). */
+const BLE_STO='e1f0a004-6f2a-4c1e-9b7d-2c0e7a90a001', STO_MAX=16384, STO_CH=17;
+let bleStoC=null, storeOk=false, storeBusy=false, storeLastUp=0, stoWait=null;
+function stoPack(days){
+  return {v:1, day:G.day, days:days||G.days, ach:G.ach, deaths:G.deaths, alerts:G.alerts,
+    domFlex:G.domFlex, domFha:G.domFha, ergo:G.ergo, hourGood:G.hourGood, hourTotal:G.hourTotal};
+}
+function stoApply(o){
+  if(!o||o.v!==1||!Array.isArray(o.days)||!Array.isArray(o.hourGood)||!Array.isArray(o.hourTotal))return false;
+  G.day=o.day||G.day; G.days=o.days; G.ach=o.ach||{}; G.deaths=o.deaths|0;
+  G.alerts=o.alerts|0; G.domFlex=o.domFlex|0; G.domFha=o.domFha|0; G.ergo=o.ergo||{};
+  for(let i=0;i<24;i++){ G.hourGood[i]=o.hourGood[i]|0; G.hourTotal[i]=o.hourTotal[i]|0; }
+  save(); return true;
+}
+async function gzipStr(str){
+  const st=new Blob([str]).stream().pipeThrough(new CompressionStream('gzip'));
+  return new Uint8Array(await new Response(st).arrayBuffer());
+}
+async function gunzipBytes(bytes){
+  const st=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return await new Response(st).text();
+}
+function stoOnNotify(dv){ if(stoWait) stoWait(new Uint8Array(dv.buffer,dv.byteOffset,dv.byteLength)); }
+// pede o bloco ao colar -> {status:0,data} | {status:1|2}  (1 = sem ficheiros, 2 = vazio)
+function stoRead(){
+  return new Promise((res,rej)=>{
+    let buf=null, got=0, seq=0, t;
+    const fin=(v,e)=>{ clearTimeout(t); stoWait=null; e?rej(e):res(v); };
+    const arm=()=>{ clearTimeout(t); t=setTimeout(()=>fin(null,new Error('timeout')),6000); };
+    arm();
+    stoWait=p=>{
+      arm();
+      if(p[0]===72){                                   // 'H' cabeçalho
+        const len=new DataView(p.buffer,p.byteOffset,p.byteLength).getUint32(2,true);
+        if(p[1]!==0||len===0) return fin({status:p[1]||2});
+        if(len>STO_MAX) return fin(null,new Error('tamanho'));
+        buf=new Uint8Array(len);
+      }else if(p[0]===68&&buf){                        // 'D' dados
+        if((p[1]|(p[2]<<8))!==seq||got+p.length-3>buf.length) return fin(null,new Error('sequência'));
+        buf.set(p.subarray(3),got); got+=p.length-3; seq++;
+        if(got===buf.length) fin({status:0,data:buf});
+      }
+    };
+    bleWrite(bleCmdC,new Uint8Array([82]));            // 'R'
+  });
+}
+// envia o bloco -> estado do colar (0 = guardado)
+async function stoWrite(bytes){
+  const n=bytes.length;
+  const ack=new Promise((res,rej)=>{
+    const t=setTimeout(()=>{ stoWait=null; rej(new Error('timeout')); },10000);
+    stoWait=p=>{ if(p[0]===75){ clearTimeout(t); stoWait=null; res(p[1]); } };
+  });
+  ack.catch(()=>{});
+  const w=(ch,d)=>(ch.writeValueWithResponse?ch.writeValueWithResponse(d):ch.writeValue(d));
+  bleBusy=true;
+  try{
+    await w(bleCmdC,new Uint8Array([87,n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255]));  // 'W'+tamanho
+    for(let i=0,seq=0;i<n;i+=STO_CH,seq++){
+      const part=bytes.subarray(i,i+STO_CH), pk=new Uint8Array(3+part.length);
+      pk[0]=68; pk[1]=seq&255; pk[2]=seq>>8; pk.set(part,3);
+      await w(bleStoC,pk);
+    }
+    return await ack;
+  }finally{ bleBusy=false; stoWait=null; }
+}
+async function stoUpload(){
+  if(!storeOk||storeBusy||!bleOn()||!bleStoC)return false;
+  storeBusy=true;
+  try{
+    let days=G.days.slice(), bytes=await gzipStr(JSON.stringify(stoPack(days)));
+    while(bytes.length>STO_MAX&&days.length>1){ days=days.slice(Math.ceil(days.length/4)); bytes=await gzipStr(JSON.stringify(stoPack(days))); }
+    const st=await stoWrite(bytes);
+    if(st!==0){ toast(T(st===3?'sto_off':'sto_err')); return false; }
+    storeLastUp=Date.now(); return true;
+  }catch(e){ toast(T('sto_err')); return false; }
+  finally{ storeBusy=false; }
+}
+// ao ligar: o colar prevalece. Numa religação automática (mesma sessão) a app
+// já tem os dados mais recentes, por isso só envia.
+async function stoSync(auto){
+  storeOk=false; bleStoC=null;
+  try{
+    const svc=await bleDev.gatt.getPrimaryService(BLE_SVC);
+    try{ bleStoC=await svc.getCharacteristic(BLE_STO); }catch(e){ return; }   // firmware antigo (v5)
+    bleStoC.addEventListener('characteristicvaluechanged',e=>stoOnNotify(e.target.value));
+    await bleStoC.startNotifications();
+    if(typeof CompressionStream==='undefined'){ return; }
+    storeOk=true;
+    if(auto){ await stoUpload(); return; }
+    let r=null;
+    for(let k=0;k<2&&!r;k++){ try{ r=await stoRead(); }catch(e){ if(k) throw e; } }
+    if(r.status===1){ storeOk=false; toast(T('sto_off')); return; }
+    if(r.status===0){
+      let ok=false;
+      try{ ok=stoApply(JSON.parse(await gunzipBytes(r.data))); }catch(e){}
+      if(ok){ storeLastUp=Date.now(); toast(T('sto_load')); return; }
+    }
+    // colar vazio (ou bloco inválido): envia os dados locais para o colar
+    if(await stoUpload()) toast(T('sto_first'));
+  }catch(e){ storeOk=false; toast(T('sto_err')); }
+}
+
+async function bleOpen(auto){
   const srv=await bleDev.gatt.connect();
   const svc=await srv.getPrimaryService(BLE_SVC);
   bleAngC=await svc.getCharacteristic(BLE_ANG);
@@ -1033,11 +1142,12 @@ async function bleOpen(){
   // acerta o relógio do colar (dias/streak funcionam mesmo sem Wi-Fi)
   const t=Math.floor(Date.now()/1000);
   await bleWrite(bleCmdC,new Uint8Array([84,t&255,(t>>>8)&255,(t>>>16)&255,(t>>>24)&255]));
+  await stoSync(auto);
   bleRetry=0;
 }
 async function bleConnect(){
   if(!navigator.bluetooth){toast(T('ble_nosup'));return}
-  if(bleOn()){ bleUserOff=true; bleDev.gatt.disconnect(); return; }
+  if(bleOn()){ await stoUpload(); bleUserOff=true; bleDev.gatt.disconnect(); return; }
   bleConnecting=true; bleUI();
   try{
     if(!bleDev){
@@ -1055,14 +1165,14 @@ async function bleConnect(){
   bleConnecting=false; bleUI();
 }
 function onBleLost(){
-  bleAngC=bleCmdC=null; collar=null; bleUI();
+  bleAngC=bleCmdC=bleStoC=null; storeOk=false; collar=null; bleUI();
   if(bleUserOff){ bleUserOff=false; return; }
   toast(T('ble_lost'));
   // tenta religar sozinho durante ~1 minuto (ex.: afastaste-te um pouco)
   const again=()=>{
     if(bleOn()||bleUserOff||!bleDev||bleRetry>=12)return;
     bleRetry++;
-    bleOpen().then(()=>{toast(T('ble_back'));bleUI();}).catch(()=>setTimeout(again,5000));
+    bleOpen(true).then(()=>{toast(T('ble_back'));bleUI();}).catch(()=>setTimeout(again,5000));
   };
   bleRetry=0; setTimeout(again,3000);
 }
@@ -1070,9 +1180,9 @@ function onBleLost(){
 function applyCollar(){
   const c=collar, p=collarPrev;
   if(p){
-    if(c.dead&&!p.dead){ G.deaths++; toast(T('death_toast')); gotchiSay('death');
+    if(c.dead&&!p.dead){ G.deaths++; storeDirty=true; toast(T('death_toast')); gotchiSay('death');
       if(G.cfg.vib&&navigator.vibrate)navigator.vibrate([400,120,400]); }
-    if(!c.dead&&p.dead){ celebrateUntil=Date.now()+6000; sndSuccess(); toast(T('reborn_toast')); gotchiSay('reborn'); }
+    if(!c.dead&&p.dead){ storeDirty=true; celebrateUntil=Date.now()+6000; sndSuccess(); toast(T('reborn_toast')); gotchiSay('reborn'); }
     if(c.mission&&!p.mission){ celebrateUntil=Date.now()+6000; sndSuccess(); gotchiSay('mission'); toast(T('mis_done')); }
   }
   G.hp=c.hp; G.exp=c.exp; G.streak=c.streak; G.dead=c.dead; G.deadRes=c.deadRes;
@@ -1114,6 +1224,7 @@ setInterval(()=>{
   rollDay();
   const L=bleLinked();                 // colar ligado: o jogo é o do colar
   if(L) applyCollar();
+  if(L&&storeOk&&!storeBusy&&(storeDirty||Date.now()-storeLastUp>600000)){ storeDirty=false; stoUpload(); }
   const fresh=Date.now()-lastGood<3000;
   let a=fresh?angleF:null;
   if(a==null&&L) a=collar.ang;         // sem câmara: mostra o ângulo do IMU do colar
@@ -1199,7 +1310,7 @@ setInterval(()=>{
   }
   $('alertFlash').classList.toggle('on',gState==='bad');
   // conquistas
-  for(const A of ACH)if(!G.ach[A.id]&&A.f()){G.ach[A.id]=Date.now();toast(A.ic+' '+T('conq')+A.t[LANG]);}
+  for(const A of ACH)if(!G.ach[A.id]&&A.f()){G.ach[A.id]=Date.now();storeDirty=true;toast(A.ic+' '+T('conq')+A.t[LANG]);}
   save(); render(a);
 },1000);
 
